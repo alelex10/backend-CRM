@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo para la tabla Company
+model Company {
+  id        Int       @id @default(autoincrement())
+  name      String
+  industry  String? // He asumido que podría ser opcional, ajústalo si es obligatorio
+  address   String? // He asumido que podría ser opcional, ajústalo si es obligatorio
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  contacts  Contact[] // Relación uno a muchos con Contact
+}
+
+// Modelo para la tabla Contact
+model Contact {
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String? // He asumido que podría ser opcional, ajústalo si es obligatorio
+  phone         String? // He asumido que podría ser opcional, ajústalo si es obligatorio
+  companyId     Int            @map("company_id")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  company       Company        @relation(fields: [companyId], references: [id]) // Definición de la relación
+  notes        Note[] // Relación uno a uno con Note
+}
+
+// Modelo para la tabla note
+model Note {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String? // He asumido que podría ser opcional, ajústalo si es obligatorio
+  contactId   Int      @unique @map("contact_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  contact     Contact  @relation(fields: [contactId], references: [id]) // Definición de la relación
+}
