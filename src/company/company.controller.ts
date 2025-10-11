@@ -1,13 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  Res,
+} from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { ResponseInterceptor } from '../common/interceptor/response.interceptor';
 
 @Controller('company')
+// @UseInterceptors(ResponseInterceptor)
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
-  @Post()
+  @Post('create')
   create(@Body() createCompanyDto: CreateCompanyDto) {
     return this.companyService.create(createCompanyDto);
   }
