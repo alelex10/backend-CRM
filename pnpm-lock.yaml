@@ -26,9 +26,6 @@ importers:
       '@prisma/client':
         specifier: 6.17.0
         version: 6.17.0(prisma@6.17.0(typescript@5.9.3))(typescript@5.9.3)
-      class-transformer:
-        specifier: ^0.5.1
-        version: 0.5.1
       class-validator:
         specifier: ^0.14.2
         version: 0.14.2
@@ -4998,7 +4995,8 @@ snapshots:
 
   cjs-module-lexer@2.1.0: {}
 
-  class-transformer@0.5.1: {}
+  class-transformer@0.5.1:
+    optional: true
 
   class-validator@0.14.2:
     dependencies:
