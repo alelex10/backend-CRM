@@ -54,19 +54,17 @@ describe('CompanyService', () => {
       expect(result).toEqual(mockCompany);
     });
 
-    it('should throw BadRequestException if company already exists', async () => {
+    it('should throw BadRequestException with the correct message if company already exists', async () => {
+      // 1. Simula el rechazo de la promesa con la excepción y el mensaje específico.
+      const errorMessage = 'Company already exists';
       mockPrismaService.company.create.mockRejectedValue(
-        new BadRequestException('Company already exists'),
+        new BadRequestException(errorMessage),
       );
 
-      // no compara el mensage de la excepción, le vasta con que la excepción se lanza
+      // Opcional: También puedes verificar el tipo de excepción y el mensaje a la vez.
+      // .toThrow() puede recibir un objeto que represente la excepción esperada.
       await expect(service.create(createCompanyDto)).rejects.toThrow(
-        'Company already exists',
-      );
-
-      // También puedes verificar el tipo de excepción
-      await expect(service.create(createCompanyDto)).rejects.toThrow(
-        BadRequestException,
+        new BadRequestException(errorMessage),
       );
     });
   });
