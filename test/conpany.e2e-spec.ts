@@ -1,4 +1,4 @@
-import { INestApplication, Module } from '@nestjs/common';
+import { INestApplication, Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { CompanyModule } from '../src/company/company.module';
@@ -7,6 +7,10 @@ import { PrismaModule } from '../src/prisma/prisma.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import request from 'supertest';
 import { ResponseInterceptor } from '../src/common/interceptor/response.interceptor';
+import { ResponsePaginatedDto } from '../src/common/abstract/response-paginated.dto';
+import { mockCompanys } from '../src/company/mock/company-data.mock';
+import { IPaginatedResponse } from '../src/common/interface/paginated-response.interface';
+import { Company } from '../generated/prisma';
 
 // configurar mi propio modulo root de test, para evitar hacer over test(testear todo)
 //solo coloco los midlerwares y los controladores que quiero testear
@@ -84,6 +88,16 @@ describe('CompanyController (e2e)', () => {
     // configuro las CORS y prefijos globales
     // app.enableCors();
     // app.setGlobalPrefix('api/v1');
+    app.useGlobalPipes(
+      new ValidationPipe({
+        // whitelist: true, // Elimina propiedades no esperadas
+        // forbidNonWhitelisted: true, // Lanza error si hay propiedades no esperadas
+        transform: true, // ¡ESTA OPCIÓN ES CRUCIAL! Habilita la transformación de tipos.
+        transformOptions: {
+          enableImplicitConversion: true, // Permite la conversión implícita (útil si @Transform no es suficiente en algunos casos, pero @Transform es más explícito)
+        },
+      }),
+    );
     await app.init();
   });
 
@@ -109,20 +123,94 @@ describe('CompanyController (e2e)', () => {
         .post('/company/create')
         .send(createCompanyDto)
         .expect(201);
-        
+
       expect(response.body.data).toMatchObject({
-        name: "Coca Cola",
+        name: 'Coca Cola',
         industry: createCompanyDto.industry,
         address: createCompanyDto.address,
-
       });
       // toBeGreaterThan(0): Verifica que el valor sea mayor que 0
       expect(response.body.data.id).toBeGreaterThan(0);
       expect(response.body.data.createdAt).toBeDefined();
       // expect(response.body.data.updatedAt).not.toBeDefined();
       expect(response.body.data.updatedAt).toBeDefined();
+    });
+  });
 
+  describe('GET /company', () => {
+    const mockCompanysAsStrings = mockCompanys.map((company) => ({
+      ...company,
+      createdAt: company.createdAt.toISOString(),
+      updatedAt: company.updatedAt.toISOString(),
+    }));
+
+    beforeEach(async () => {
+      await prisma.company.createMany({
+        data: mockCompanys,
+      });
     });
 
+    it('should get all companies whit "values default" when page and limit are provided', async () => {
+      const received = await request(app.getHttpServer())
+        .get('/company')
+        .query({ page: 1, limit: 10 })
+        .expect(200);
+
+      expect(received.body.data).toEqual({
+        data: expect.arrayContaining(mockCompanysAsStrings),
+        total: mockCompanys.length,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
+    });
+
+    it('should get all companies whit "values default" when page and limit are not provided', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/company')
+        .query({ page: 1 })
+        .expect(200);
+
+      expect(response.body.data).toEqual({
+        data: expect.arrayContaining(mockCompanysAsStrings),
+        total: mockCompanys.length,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
+    });
+
+    it('should get all companies whit "values default" when page and limit are not provided', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/company')
+        .query({ limit: 3 })
+        .expect(200);
+
+      expect(response.body.data).toEqual({
+        data: expect.arrayContaining(mockCompanysAsStrings),
+        total: mockCompanys.length,
+        page: 1,
+        limit: 3,
+        totalPages: 1,
+      });
+    });
+
+    it('should get all companies whit "values default" when page and limit are not provided', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/company')
+        .expect(200);
+
+      expect(response.body.data).toEqual({
+        data: expect.arrayContaining(mockCompanysAsStrings),
+        total: mockCompanys.length,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
+    });
+
+    
   });
+
+  
 });

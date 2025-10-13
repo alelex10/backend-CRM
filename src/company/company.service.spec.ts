@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CompanyService } from './company.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
-import { mockCompany } from './mock/company-data.mock';
+import { mockCompany, mockCompanys } from './mock/company-data.mock';
 import { BadRequestException } from '@nestjs/common';
 
 describe('CompanyService', () => {
@@ -71,6 +71,33 @@ describe('CompanyService', () => {
       await expect(service.create(createCompanyDto)).rejects.toThrow(
         new BadRequestException(errorMessage),
       );
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return an paginated list of companies when page and limit are provided ', async () => {
+      const companies = [mockCompanys];
+      mockPrismaService.company.findMany.mockResolvedValue(companies);
+      const result = await service.findAll({ page: 1, limit: 10 });
+      expect(result.data).toEqual(companies);
+    });
+
+    it('should return an paginated list of companies when page and limit are not provided ', async () => {
+      mockPrismaService.company.findMany.mockResolvedValue(mockCompanys);
+      const result = await service.findAll({ page: 1 });
+      expect(result.data).toEqual(mockCompanys);
+    });
+
+    it('should return an paginated list of companies when page and limit are not provided ', async () => {
+      mockPrismaService.company.findMany.mockResolvedValue(mockCompanys);
+      const result = await service.findAll({ limit: 10 });
+      expect(result.data).toEqual(mockCompanys);
+    });
+
+    it('should return an paginated list of companies when page and limit are not provided ', async () => {
+      mockPrismaService.company.findMany.mockResolvedValue(mockCompanys);
+      const result = await service.findAll({});
+      expect(result.data).toEqual(mockCompanys);
     });
   });
 });

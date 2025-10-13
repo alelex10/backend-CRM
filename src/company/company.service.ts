@@ -3,6 +3,9 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Company } from '../../generated/prisma';
+import { IPaginatedResponse } from '../common/interface/paginated-response.interface';
+import { ResponsePaginatedDto } from '../common/abstract/response-paginated.dto';
+import { Find } from '../common/abstract/find';
 
 @Injectable()
 export class CompanyService {
@@ -27,8 +30,24 @@ export class CompanyService {
     return !isUnique;
   }
 
-  findAll() {
-    return `This action returns all company`;
+  // traemos todas las company paginados
+  async findAll(query: Find): Promise<IPaginatedResponse<Company>> {
+    const { page = 1, limit = 10, search, order } = query;
+
+    const companies = await this.prisma.company.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        name: {
+          contains: search,
+        },
+      },
+      orderBy: {
+        name: order,
+      },
+    });
+
+    return new ResponsePaginatedDto(companies, page, limit);
   }
 
   findOne(id: number) {

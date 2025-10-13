@@ -8,11 +8,13 @@ import {
   Delete,
   UseInterceptors,
   Res,
+  Query,
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { ResponseInterceptor } from '../common/interceptor/response.interceptor';
+import { Find } from '../common/abstract/find';
+import { FintUserDto } from './dto/fint-user.dto';
 
 @Controller('company')
 // @UseInterceptors(ResponseInterceptor)
@@ -24,9 +26,10 @@ export class CompanyController {
     return this.companyService.create(createCompanyDto);
   }
 
+  // traer todos los company paginado
   @Get()
-  findAll() {
-    return this.companyService.findAll();
+  findAll(@Query() query: FintUserDto) {
+    return this.companyService.findAll(query);
   }
 
   @Get(':id')
