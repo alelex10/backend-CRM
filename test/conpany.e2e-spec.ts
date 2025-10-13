@@ -32,7 +32,7 @@ describe('CompanyController (e2e)', () => {
   let configService: ConfigService;
   //   mock para los guard
   const mockAuthGuard = {
-    canActivate: (context) => {a
+    canActivate: (context) => {
       // simule token and roles
       const request = context.switchToHttp().getRequest();
       request.user = { id: 1, role: ['USER', 'ADMIN'] }; //[ROLE.USER, ROLE.ADMIN]
