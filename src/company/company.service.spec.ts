@@ -31,7 +31,7 @@ describe('CompanyService', () => {
     }).compile();
 
     service = module.get<CompanyService>(CompanyService);
-    prismaService = module.get<PrismaService>(PrismaService);
+    prismaService = module.get(PrismaService);
 
     jest.clearAllMocks();
   });
@@ -47,8 +47,13 @@ describe('CompanyService', () => {
       address: '123 Main St, Anytown, USA',
     };
     it('should create a company successfully', async () => {
+      /* jest
+        .spyOn(prismaService.company, 'create')
+        .mockResolvedValue(mockCompany); */
+
       mockPrismaService.company.create.mockResolvedValue(mockCompany);
-      mockPrismaService.company.findFirst.mockResolvedValue(mockCompany.name);
+      // mockeamos el findFirst para revisamos que no se repita el name de la empresa
+      mockPrismaService.company.findFirst.mockResolvedValue(!mockCompany.name);
 
       const result = await service.create(createCompanyDto);
       expect(result).toEqual(mockCompany);

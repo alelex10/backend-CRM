@@ -9,7 +9,8 @@ export class CompanyService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
-    if (await this.isUniqueName(createCompanyDto.name)) {
+    const isUnique = await this.isUniqueName(createCompanyDto.name);
+    if (!isUnique) {
       throw new BadRequestException('Company already exists');
     }
     return this.prisma.company.create({
