@@ -236,6 +236,9 @@ describe('CompanyController (e2e)', () => {
         data: mockCompanys,
       });
     });
+    afterAll(async () => {
+      await prisma.company.deleteMany();
+    })
 
     it('should update a company successfully', async () => {
       const response = await request(app.getHttpServer())
