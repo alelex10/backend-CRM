@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -86,7 +86,17 @@ export class CompanyService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  async remove(id: number): Promise<Company> {
+    // eliminar company
+    try {
+      const company = await this.prisma.company.delete({
+        where: {
+          id,
+        },
+      });
+      return company;
+    } catch (error) {
+      throw new NotFoundException(`Company not found With id: ${id}`);
+    }
   }
 }

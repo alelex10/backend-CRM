@@ -238,7 +238,7 @@ describe('CompanyController (e2e)', () => {
     });
     afterAll(async () => {
       await prisma.company.deleteMany();
-    })
+    });
 
     it('should update a company successfully', async () => {
       const response = await request(app.getHttpServer())
@@ -263,6 +263,37 @@ describe('CompanyController (e2e)', () => {
         message: 'Company not found With id: 999',
         error: 'Bad Request',
         statusCode: 400,
+      });
+    });
+  });
+
+  describe('DELETE /company/:id', () => {
+    beforeEach(async () => {
+      await prisma.company.createMany({
+        data: mockCompanys,
+      });
+    });
+    afterAll(async () => {
+      await prisma.company.deleteMany();
+    });
+
+    it('should delete a company successfully', async () => {
+      const response = await request(app.getHttpServer())
+        .delete('/company/1')
+        .expect(200);
+
+      expect(response.body.data).toEqual(mockCompanysAsStrings[0]);
+    });
+
+    it('should throw NotFoundException when company not found', async () => {
+      const response = await request(app.getHttpServer())
+        .delete('/company/999')
+        .expect(404);
+
+      expect(response.body).toEqual({
+        message: 'Company not found With id: 999',
+        error: 'Not Found',
+        statusCode: 404,
       });
     });
   });

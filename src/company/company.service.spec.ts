@@ -3,7 +3,7 @@ import { CompanyService } from './company.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { mockCompany, mockCompanys } from './mock/company-data.mock';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company } from '../../generated/prisma';
 
@@ -163,7 +163,23 @@ describe('CompanyService', () => {
         new BadRequestException(errorMessage),
       );
     });
+  });
 
-    
+  describe('remove', () => {
+    const id = 1;
+    it('should remove a company successfully', async () => {
+      mockPrismaService.company.delete.mockResolvedValue(mockCompany);
+      const result = await service.remove(id);
+      expect(result).toEqual(mockCompany);
+    });
+
+    it('should return "Company not found With id: ${id}" when id is invalid', async () => {
+      const errorMessage = `Company not found With id: ${id}`;
+      mockPrismaService.company.delete.mockRejectedValue(new Error());
+
+      await expect(service.remove(id)).rejects.toThrow(
+        new NotFoundException(errorMessage),
+      );
+    });
   });
 });
