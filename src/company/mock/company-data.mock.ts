@@ -1,4 +1,5 @@
 import { Company } from 'generated/prisma';
+import { UpdateCompanyDto } from '../dto/update-company.dto';
 
 export const mockCompany: Company = {
   id: 1,
@@ -20,3 +21,15 @@ export const mockCompanys: Company[] = [
     updatedAt: new Date(),
   },
 ];
+
+export const mockCompanysAsStrings = mockCompanys.map((company) => ({
+  ...company,
+  createdAt: company.createdAt.toISOString(),
+  updatedAt: company.updatedAt.toISOString(),
+}));
+
+export const mockReqCompanyUpdated: UpdateCompanyDto = {
+  name: 'Village',
+  industry: 'Bad Drinks',
+  address: '323 Main St, Anytown, USA',
+};

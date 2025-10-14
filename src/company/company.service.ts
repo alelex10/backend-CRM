@@ -13,21 +13,26 @@ export class CompanyService {
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
     const isUnique = await this.isUniqueName(createCompanyDto.name);
-    if (!isUnique) {
+
+    if (isUnique) {
       throw new BadRequestException('Company already exists');
     }
+
     return this.prisma.company.create({
       data: createCompanyDto,
     });
   }
 
+  // verificamos si el name de la company ya existe
+  // si existe devolvemos true
   async isUniqueName(name: string): Promise<boolean> {
-    const isUnique = await this.prisma.company.findFirst({
+    const company = await this.prisma.company.findFirst({
       where: {
         name,
       },
     });
-    return !isUnique;
+
+    return !!company;
   }
 
   // traemos todas las company paginados
@@ -50,12 +55,35 @@ export class CompanyService {
     return new ResponsePaginatedDto(companies, page, limit);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  async findOne(id: number): Promise<Company> {
+    const company = await this.prisma.company.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!company)
+      throw new BadRequestException(`Company not found With id: ${id}`);
+
+    return company;
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(
+    id: number,
+    updateCompanyDto: UpdateCompanyDto,
+  ): Promise<Company> {
+    // editar company
+    try {
+      const company = await this.prisma.company.update({
+        where: {
+          id,
+        },
+        data: updateCompanyDto,
+      });
+      return company;
+    } catch (error) {
+      throw new BadRequestException(`Company not found With id: ${id}`);
+    }
   }
 
   remove(id: number) {

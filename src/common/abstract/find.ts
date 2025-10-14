@@ -26,7 +26,7 @@ export abstract class Find {
   @Min(1)
   @Transform(({ value }) =>
     value === undefined || value === '' ? 1 : Number(value),
-  ) // Agrega esta línea
+  )
   page?: number = 1;
 
   @IsOptional()
@@ -34,7 +34,7 @@ export abstract class Find {
   @Min(1)
   @Transform(({ value }) =>
     value === undefined || value === '' ? 10 : Number(value),
-  ) // Agrega esta línea
+  )
   limit?: number = 10;
 
   //   @IsOptional()

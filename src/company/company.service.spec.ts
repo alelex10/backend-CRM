@@ -4,6 +4,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { mockCompany, mockCompanys } from './mock/company-data.mock';
 import { BadRequestException } from '@nestjs/common';
+import { UpdateCompanyDto } from './dto/update-company.dto';
+import { Company } from '../../generated/prisma';
 
 describe('CompanyService', () => {
   let service: CompanyService;
@@ -42,7 +44,7 @@ describe('CompanyService', () => {
 
   describe('create', () => {
     const createCompanyDto: CreateCompanyDto = {
-      name: 'Coca Cola',
+      name: 'Coca Cola 123eweq 132',
       industry: 'Soft Drinks',
       address: '123 Main St, Anytown, USA',
     };
@@ -53,7 +55,7 @@ describe('CompanyService', () => {
 
       mockPrismaService.company.create.mockResolvedValue(mockCompany);
       // mockeamos el findFirst para revisamos que no se repita el name de la empresa
-      mockPrismaService.company.findFirst.mockResolvedValue(!mockCompany.name);
+      mockPrismaService.company.findFirst.mockResolvedValue(null);
 
       const result = await service.create(createCompanyDto);
       expect(result).toEqual(mockCompany);
@@ -62,15 +64,17 @@ describe('CompanyService', () => {
     it('should throw BadRequestException with the correct message if company already exists', async () => {
       // 1. Simula el rechazo de la promesa con la excepción y el mensaje específico.
       const errorMessage = 'Company already exists';
-      mockPrismaService.company.create.mockRejectedValue(
-        new BadRequestException(errorMessage),
-      );
+      // 1. Simula que findFirst encuentra una compañía (lo que significa que ya existe)
+      mockPrismaService.company.findFirst.mockResolvedValue(mockCompany); // mockCompany representa una compañía existente
 
-      // Opcional: También puedes verificar el tipo de excepción y el mensaje a la vez.
-      // .toThrow() puede recibir un objeto que represente la excepción esperada.
+      // 2. Espera que la llamada a service.create lance el BadRequestException
+      // No necesitamos mockear create ni que sea rejectada, porque la excepción se lanza ANTES.
       await expect(service.create(createCompanyDto)).rejects.toThrow(
         new BadRequestException(errorMessage),
       );
+
+      // 3. Asegúrate de que prisma.company.create NUNCA fue llamado en este caso
+      expect(mockPrismaService.company.create).not.toHaveBeenCalled();
     });
   });
 
@@ -99,5 +103,67 @@ describe('CompanyService', () => {
       const result = await service.findAll({});
       expect(result.data).toEqual(mockCompanys);
     });
+  });
+
+  describe('findOne', () => {
+    it('should return a company when id is valid', async () => {
+      mockPrismaService.company.findUnique.mockResolvedValue(mockCompany);
+      const result = await service.findOne(1);
+      expect(result).toEqual(mockCompany);
+    });
+
+    it('should return "Company not found With id: ${id}" when id is invalid', async () => {
+      const id = 1;
+      const errorMessage = `Company not found With id: ${id}`;
+      mockPrismaService.company.findUnique.mockResolvedValue(null);
+
+      await expect(service.findOne(id)).rejects.toThrow(
+        new BadRequestException(errorMessage),
+      );
+    });
+  });
+
+  describe('update', () => {
+    let updateCompanyDto: UpdateCompanyDto;
+    let mockCompanyUpdated: Company;
+    beforeEach(() => {
+      updateCompanyDto = {
+        name: 'Village',
+        industry: 'Bad Drinks',
+        address: '323 Main St, Anytown, USA',
+      };
+
+      mockCompanyUpdated = {
+        ...mockCompany,
+        ...updateCompanyDto,
+      };
+    });
+    it('should update a company successfully', async () => {
+      const id = 1;
+      mockPrismaService.company.update.mockResolvedValue(mockCompanyUpdated);
+      const result = await service.update(id, updateCompanyDto);
+      expect(result).toEqual(mockCompanyUpdated);
+    });
+
+    it('should return "Company not found With id: ${id}" when id is invalid', async () => {
+      const id = 11324124;
+      const errorMessage = `Company not found With id: ${id}`;
+
+      // En lugar de mockResolvedValue(new Error()), usamos mockRejectedValue
+      // para simular que la operación de Prisma falla.
+      // No necesitamos envolverlo en un Error explícitamente,
+      // Jest manejará el rechazo. Si quieres simular un error específico de Prisma,
+      // podrías usar mockRejectedValue(new SomePrismaError(...)) si tuvieras esa clase.
+      // Para este caso, simplemente rechazar es suficiente.
+      mockPrismaService.company.update.mockRejectedValue(
+        new Error('Company not found'),
+      ); // O simplemente mockRejectedValue()
+
+      await expect(service.update(id, updateCompanyDto)).rejects.toThrow(
+        new BadRequestException(errorMessage),
+      );
+    });
+
+    
   });
 });

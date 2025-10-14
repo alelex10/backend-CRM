@@ -7,10 +7,12 @@ import { PrismaModule } from '../src/prisma/prisma.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import request from 'supertest';
 import { ResponseInterceptor } from '../src/common/interceptor/response.interceptor';
-import { ResponsePaginatedDto } from '../src/common/abstract/response-paginated.dto';
-import { mockCompanys } from '../src/company/mock/company-data.mock';
-import { IPaginatedResponse } from '../src/common/interface/paginated-response.interface';
-import { Company } from '../generated/prisma';
+import {
+  mockCompanys,
+  mockCompanysAsStrings,
+  mockReqCompanyUpdated,
+} from '../src/company/mock/company-data.mock';
+import { UpdateCompanyDto } from '../src/company/dto/update-company.dto';
 
 // configurar mi propio modulo root de test, para evitar hacer over test(testear todo)
 //solo coloco los midlerwares y los controladores que quiero testear
@@ -138,12 +140,6 @@ describe('CompanyController (e2e)', () => {
   });
 
   describe('GET /company', () => {
-    const mockCompanysAsStrings = mockCompanys.map((company) => ({
-      ...company,
-      createdAt: company.createdAt.toISOString(),
-      updatedAt: company.updatedAt.toISOString(),
-    }));
-
     beforeEach(async () => {
       await prisma.company.createMany({
         data: mockCompanys,
@@ -208,9 +204,63 @@ describe('CompanyController (e2e)', () => {
         totalPages: 1,
       });
     });
-
-    
   });
 
-  
+  describe('GET /company/:id', () => {
+    beforeEach(async () => {
+      await prisma.company.createMany({
+        data: mockCompanys,
+      });
+    });
+
+    it('should get a company successfully', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/company/1')
+        .expect(200);
+
+      expect(response.body.data).toEqual(mockCompanysAsStrings[0]);
+    });
+
+    it('should get a company successfully', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/company/2')
+        .expect(200);
+
+      expect(response.body.data).toEqual(mockCompanysAsStrings[1]);
+    });
+  });
+
+  describe('PATCH /company/:id', () => {
+    beforeEach(async () => {
+      await prisma.company.createMany({
+        data: mockCompanys,
+      });
+    });
+
+    it('should update a company successfully', async () => {
+      const response = await request(app.getHttpServer())
+        .patch('/company/1')
+        .send(mockReqCompanyUpdated)
+        .expect(200);
+
+      expect(response.body.data).toMatchObject({
+        ...mockCompanysAsStrings[0],
+        ...mockReqCompanyUpdated,
+        updatedAt: expect.any(String),
+      });
+    });
+
+    it('should throw BadRequestException when company not found', async () => {
+      const response = await request(app.getHttpServer())
+        .patch('/company/999')
+        .send(mockReqCompanyUpdated)
+        .expect(400);
+
+      expect(response.body).toEqual({
+        message: 'Company not found With id: 999',
+        error: 'Bad Request',
+        statusCode: 400,
+      });
+    });
+  });
 });
