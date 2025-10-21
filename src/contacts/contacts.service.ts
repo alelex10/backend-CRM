@@ -15,9 +15,73 @@ export class ContactsService {
     });
   }
 
-  // Obtener todos los contactos
-  findAll() {
-    return `This action returns all contacts`;
+  // Obtener todos los contactos con/sin filtros
+  async findAll(params?: {
+    name?: string;
+    email?: string;
+    orderBy?: string;
+    order?: 'asc' | 'desc';
+    page?: number;
+    //limit?: number;
+  }) {
+    const {
+      name,
+      email,
+      orderBy = 'createdAt',
+      order = 'asc',
+      page = 1,
+      //limit = 10,
+    } = params || {};
+
+    const limit = 10;
+
+    const skip = (page - 1) * limit;
+
+    /*const where = {
+      ...(name && { name: { contains: name, mode: 'insensitive' } }),
+      ...(email && { email: { contains: email, mode: 'insensitive' } }),
+    };*/
+
+    // Obtener todos los contactos
+    const [data, total] = await Promise.all([
+      this.prisma.contact.findMany({
+        where: {
+          ...(name && { name: { contains: name, mode: 'insensitive' } }),
+          ...(email && { email: { contains: email, mode: 'insensitive' } }),
+        },
+        orderBy: {
+          [orderBy]: order,
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.contact.count({
+        where: {
+          ...(name && { name: { contains: name, mode: 'insensitive' } }),
+          ...(email && { email: { contains: email, mode: 'insensitive' } }),
+        },
+      }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+
+    /*return this.prisma.contact.findMany({
+      where: {
+        ...(name && { name: { contains: name, mode: 'insensitive' } }),
+        ...(email && { email: { contains: email, mode: 'insensitive' } }),
+      },
+      orderBy: {
+        [orderBy]: order,
+      },
+      skip,
+      take: limit,
+    });*/
   }
 
   // Obtener un contacto por ID
