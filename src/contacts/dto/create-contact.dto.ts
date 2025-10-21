@@ -12,8 +12,8 @@ export class CreateContactDto {
   name: string;
 
   @IsEmail()
-  @IsOptional()
-  email?: string;
+  @IsNotEmpty()
+  email: string;
 
   @IsString()
   @IsOptional()
