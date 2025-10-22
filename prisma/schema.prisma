@@ -36,15 +36,15 @@ model Contact {
   updatedAt     DateTime       @updatedAt @map("updated_at")
   deletedAt     DateTime?      @map("deleted_at")
   company       Company        @relation(fields: [companyId], references: [id]) // Definición de la relación
-  notes        Note[] // Relación uno a uno con Note
+  notes         Note[] // Relación uno a uno con Note
 }
 
 // Modelo para la tabla note
 model Note {
   id          Int      @id @default(autoincrement())
   title       String
-  description String? // He asumido que podría ser opcional, ajústalo si es obligatorio
-  contactId   Int      @unique @map("contact_id")
+  description String?  // He asumido que podría ser opcional, ajústalo si es obligatorio
+  contactId   Int      @map("contact_id")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   contact     Contact  @relation(fields: [contactId], references: [id]) // Definición de la relación
