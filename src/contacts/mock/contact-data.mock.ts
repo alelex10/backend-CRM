@@ -8,6 +8,7 @@ export const mockContact: Contact = {
   companyId: 1,
   createdAt: new Date(),
   updatedAt: new Date(),
+  deletedAt: null,
 };
 
 export const mockContacts: Contact[] = [
@@ -20,5 +21,6 @@ export const mockContacts: Contact[] = [
     companyId: 1,
     createdAt: new Date(),
     updatedAt: new Date(),
+    deletedAt: null,
   },
 ];

@@ -49,7 +49,8 @@ export class ContactsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.contactsService.remove(Number(id));
+  async remove(@Param('id') id: string) {
+    await this.contactsService.remove(Number(id));
+    return { message: `Contact with ID ${id} deleted successfully` };
   }
 }

@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Contact } from '../../generated/prisma';
+//import { Contact } from '@prisma/client';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
+import { Contact } from '@prisma/client';
 
 @Injectable()
 export class ContactsService {
@@ -22,7 +23,6 @@ export class ContactsService {
     orderBy?: string;
     order?: 'asc' | 'desc';
     page?: number;
-    //limit?: number;
   }) {
     const {
       name,
@@ -30,7 +30,6 @@ export class ContactsService {
       orderBy = 'createdAt',
       order = 'asc',
       page = 1,
-      //limit = 10,
     } = params || {};
 
     const limit = 10;
@@ -38,6 +37,7 @@ export class ContactsService {
     const skip = (page - 1) * limit;
 
     /*const where = {
+      deletedAt: null,
       ...(name && { name: { contains: name, mode: 'insensitive' } }),
       ...(email && { email: { contains: email, mode: 'insensitive' } }),
     };*/
@@ -46,6 +46,7 @@ export class ContactsService {
     const [data, total] = await Promise.all([
       this.prisma.contact.findMany({
         where: {
+          deletedAt: null,
           ...(name && { name: { contains: name, mode: 'insensitive' } }),
           ...(email && { email: { contains: email, mode: 'insensitive' } }),
         },
@@ -57,6 +58,7 @@ export class ContactsService {
       }),
       this.prisma.contact.count({
         where: {
+          deletedAt: null,
           ...(name && { name: { contains: name, mode: 'insensitive' } }),
           ...(email && { email: { contains: email, mode: 'insensitive' } }),
         },
@@ -70,18 +72,6 @@ export class ContactsService {
       limit,
       totalPages: Math.ceil(total / limit),
     };
-
-    /*return this.prisma.contact.findMany({
-      where: {
-        ...(name && { name: { contains: name, mode: 'insensitive' } }),
-        ...(email && { email: { contains: email, mode: 'insensitive' } }),
-      },
-      orderBy: {
-        [orderBy]: order,
-      },
-      skip,
-      take: limit,
-    });*/
   }
 
   // Obtener un contacto por ID
@@ -90,6 +80,10 @@ export class ContactsService {
 
     if (!contact) {
       throw new NotFoundException(`Contact with ID ${id} not found`);
+    }
+
+    if (contact.deletedAt) {
+      throw new NotFoundException(`Contact with ID ${id} deleted`);
     }
 
     return contact;
@@ -108,7 +102,13 @@ export class ContactsService {
   }
 
   // Eliminar un contacto
-  remove(id: number) {
-    return `This action removes the contact #${id}`;
+  async remove(id: number): Promise<void> {
+    await this.findOne(id);
+
+    // Borrado lógico
+    await this.prisma.contact.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
   }
 }
