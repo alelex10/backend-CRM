@@ -64,6 +64,11 @@ export class CompanyService {
       where: {
         id,
       },
+      include: {
+        contacts: {
+          where: { deletedAt: null },
+        },
+      },
     });
 
     if (!company)
