@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-//import { Contact } from '@prisma/client';
+import { Contact, Prisma } from '../../generated/prisma';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
-import { Contact } from '@prisma/client';
 
 @Injectable()
 export class ContactsService {
@@ -36,20 +35,16 @@ export class ContactsService {
 
     const skip = (page - 1) * limit;
 
-    /*const where = {
+    const where: Prisma.ContactWhereInput = {
       deletedAt: null,
       ...(name && { name: { contains: name, mode: 'insensitive' } }),
       ...(email && { email: { contains: email, mode: 'insensitive' } }),
-    };*/
+    };
 
     // Obtener todos los contactos
     const [data, total] = await Promise.all([
       this.prisma.contact.findMany({
-        where: {
-          deletedAt: null,
-          ...(name && { name: { contains: name, mode: 'insensitive' } }),
-          ...(email && { email: { contains: email, mode: 'insensitive' } }),
-        },
+        where,
         orderBy: {
           [orderBy]: order,
         },
@@ -57,11 +52,7 @@ export class ContactsService {
         take: limit,
       }),
       this.prisma.contact.count({
-        where: {
-          deletedAt: null,
-          ...(name && { name: { contains: name, mode: 'insensitive' } }),
-          ...(email && { email: { contains: email, mode: 'insensitive' } }),
-        },
+        where,
       }),
     ]);
 
@@ -75,7 +66,7 @@ export class ContactsService {
   }
 
   // Obtener un contacto por ID
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Contact> {
     const contact = await this.prisma.contact.findUnique({ where: { id } });
 
     if (!contact) {
@@ -90,7 +81,10 @@ export class ContactsService {
   }
 
   // Actualizar un contacto
-  async update(id: number, updateContactDto: UpdateContactDto) {
+  async update(
+    id: number,
+    updateContactDto: UpdateContactDto,
+  ): Promise<Contact> {
     await this.findOne(id);
 
     const updatedContact = await this.prisma.contact.update({
