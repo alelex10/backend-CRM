@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Contact } from '../../generated/prisma';
 import { CreateContactDto } from './dto/create-contact.dto';
@@ -85,13 +85,26 @@ export class ContactsService {
   }
 
   // Obtener un contacto por ID
-  findOne(id: number) {
-    return `This action returns the contact #${id}`;
+  async findOne(id: number) {
+    const contact = await this.prisma.contact.findUnique({ where: { id } });
+
+    if (!contact) {
+      throw new NotFoundException(`Contact with ID ${id} not found`);
+    }
+
+    return contact;
   }
 
   // Actualizar un contacto
-  update(id: number, updateCompanyDto: UpdateContactDto) {
-    return `This action updates the contact #${id}`;
+  async update(id: number, updateContactDto: UpdateContactDto) {
+    await this.findOne(id);
+
+    const updatedContact = await this.prisma.contact.update({
+      where: { id },
+      data: updateContactDto,
+    });
+
+    return updatedContact;
   }
 
   // Eliminar un contacto
