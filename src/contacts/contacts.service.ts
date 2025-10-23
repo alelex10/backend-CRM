@@ -67,7 +67,12 @@ export class ContactsService {
 
   // Obtener un contacto por ID
   async findOne(id: number): Promise<Contact> {
-    const contact = await this.prisma.contact.findUnique({ where: { id } });
+    const contact = await this.prisma.contact.findUnique({
+      where: { id },
+      include: {
+        notes: true,
+      },
+    });
 
     if (!contact) {
       throw new NotFoundException(`Contact with ID ${id} not found`);
