@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { ConfigModule } from '@nestjs/config';
 import { ContactsModule } from './contacts/contacts.module';
+import { NotesModule } from './notes/notes.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ContactsModule } from './contacts/contacts.module';
     // es para usar la base de datos de prisma en todo el proyecto
     { module: PrismaModule, global: true },
     ContactsModule,
+    NotesModule,
   ],
   providers: [
     AppService,
