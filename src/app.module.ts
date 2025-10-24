@@ -7,22 +7,36 @@ import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import { ConfigModule } from '@nestjs/config';
 import { ContactsModule } from './contacts/contacts.module';
 import { NotesModule } from './notes/notes.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    // esta configuración es para que las variables de entorno se puedan usar en todo el proyecto
     ConfigModule.forRoot({ isGlobal: true }),
     CompanyModule,
-    // es para usar la base de datos de prisma en todo el proyecto
+
     { module: PrismaModule, global: true },
     ContactsModule,
     NotesModule,
+    UserModule,
+    AuthModule,
   ],
   providers: [
     AppService,
     {
       provide: 'APP_INTERCEPTOR',
       useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

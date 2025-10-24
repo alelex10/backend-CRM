@@ -22,9 +22,6 @@ export class AuthController {
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
 
-  // para proteger la ruta de manera individual
-  // el orden de los guards es importante por que AuthGuard debe correr antes que RolesGuard, para poner user en request y que RolesGuard pueda usarlo
-  // @UseGuards(AuthGuard, RolesGuard) // no es necesario si el guard se aplica globalmente en app.module.ts
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;

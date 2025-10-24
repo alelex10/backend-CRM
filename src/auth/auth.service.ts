@@ -23,11 +23,11 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException();
     }
-    
-    if (!await bcrypt.compare(pass, user.password)) {
+
+    if (!(await bcrypt.compare(pass, user.password))) {
       throw new UnauthorizedException();
     }
-    // payload es la data que queremos guardar en el token
+
     const payload = {
       sub: user.userId,
       username: user.username,

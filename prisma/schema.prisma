@@ -49,3 +49,4 @@ model Note {
   updatedAt   DateTime @updatedAt @map("updated_at")
   contact     Contact  @relation(fields: [contactId], references: [id]) // Definición de la relación
 }
+
