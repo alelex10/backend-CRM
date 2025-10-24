@@ -55,7 +55,7 @@ describe('ContactsService (Unit)', () => {
     it('should call prisma.contact.create and return a contact', async () => {
       prismaMock.contact.create.mockResolvedValue(mockContact);
 
-      const result = await service.create(createContactDto);
+      const result = await service.create(createContactDto, 1);
 
       expect(prismaMock.contact.create).toHaveBeenCalledWith({
         data: createContactDto,
