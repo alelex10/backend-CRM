@@ -10,6 +10,8 @@ import {
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { SignInRequestDto } from './dtos/sign-in-request.dto';
+import { register } from 'module';
+import { RegisterRequestDto } from './dtos/register-request.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -19,11 +21,12 @@ export class AuthController {
   @Public()
   @Post('login')
   signIn(@Body() signInDto: SignInRequestDto) {
-    return this.authService.signIn(signInDto.username, signInDto.password);
+    return this.authService.signIn(signInDto.email, signInDto.password);
   }
 
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  @Public()
+  @Post('register')
+  register(@Body() registerDto: RegisterRequestDto) {
+    return this.authService.register(registerDto);
   }
 }

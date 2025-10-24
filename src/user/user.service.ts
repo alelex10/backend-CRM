@@ -1,48 +1,82 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { User } from './entities/user.entity';
-import { Role } from 'src/auth/enums/rol.enum';
-import * as bcrypt from 'bcrypt';
+import { Role, User } from '../../generated/prisma';
+import { PrismaService } from '../prisma/prisma.service';
 
-// This should be a real class/interface representing a user entity
-type UsersProvider = () => Promise<User[]>;
 @Injectable()
 export class UserService {
+  constructor(private readonly prisma: PrismaService) {}
+
   // simulate database
-  private readonly users: UsersProvider = async () => [
-    {
-      userId: 1,
-      username: 'john',
-      password: await bcrypt.hash('123123', 10),
-      roles: [Role.User],
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: await bcrypt.hash('secret', 10),
-      roles: [Role.Admin],
-    },
-  ];
-
+  // private readonly users: () => Promise<User[]> = async () => [
+  //   {
+  //     username: 'john',
+  //     password: await bcrypt.hash('123123', 10),
+  //     roles: [Role.USER],
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //     contacts: [],
+  //     companies: [],
+  //     email: 'john@example',
+  //     id: 1,
+  //   },
+  //   {
+  //     username: 'jane',
+  //     password: await bcrypt.hash('123123', 10),
+  //     roles: [Role.USER],
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //     contacts: [],
+  //     companies: [],
+  //     email: 'jane@example',
+  //     id: 2,
+  //   },
+  // ];
+  getProfile(id: number) {
+    return this.findById(id);
+  }
   async getAllUsers(): Promise<User[]> {
-    return this.users();
+    return await this.prisma.user.findMany();
   }
 
-  async findOne(username: string): Promise<User | undefined> {
-    const allUsers = await this.getAllUsers();
-    return allUsers.find((user) => user.username === username);
+  async findById(id: number): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return user;
   }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+
+    return user;
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    if (!createUserDto.roles) {
+      createUserDto.roles = [Role.USER];
+    }
+    return await this.prisma.user.create({
+      data: createUserDto,
+    });
   }
 
   findAll() {
     return `This action returns all user`;
   }
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    return await this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
+    });
   }
 
   remove(id: number) {

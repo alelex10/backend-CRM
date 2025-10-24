@@ -23,30 +23,50 @@ model Company {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   contacts  Contact[] // Relación uno a muchos con Contact
+  User      User?     @relation(fields: [userId], references: [id])
+  userId    Int?
 }
 
 // Modelo para la tabla Contact
 model Contact {
-  id            Int            @id @default(autoincrement())
-  name          String
-  email         String? // He asumido que podría ser opcional, ajústalo si es obligatorio
-  phone         String? // He asumido que podría ser opcional, ajústalo si es obligatorio
-  companyId     Int            @map("company_id")
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-  deletedAt     DateTime?      @map("deleted_at")
-  company       Company        @relation(fields: [companyId], references: [id]) // Definición de la relación
-  notes         Note[] // Relación uno a uno con Note
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String? // He asumido que podría ser opcional, ajústalo si es obligatorio
+  phone     String? // He asumido que podría ser opcional, ajústalo si es obligatorio
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  company   Company   @relation(fields: [companyId], references: [id]) // Definición de la relación
+  companyId Int       @map("company_id")
+  notes     Note[] // Relación uno a uno con Note
+  User      User?     @relation(fields: [userId], references: [id])
+  userId    Int?      @map("user_id")
 }
 
 // Modelo para la tabla note
 model Note {
   id          Int      @id @default(autoincrement())
   title       String
-  description String?  // He asumido que podría ser opcional, ajústalo si es obligatorio
+  description String? // He asumido que podría ser opcional, ajústalo si es obligatorio
   contactId   Int      @map("contact_id")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   contact     Contact  @relation(fields: [contactId], references: [id]) // Definición de la relación
 }
 
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String
+  email     String    @unique
+  password  String
+  roles     Role[]
+  contacts  Contact[] // Relación uno a muchos con Contact
+  companies Company[] // Relación uno a muchos con Company
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+}
+
+enum Role {
+  ADMIN
+  USER
+}

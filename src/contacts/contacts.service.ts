@@ -11,7 +11,7 @@ export class ContactsService {
   // Crear un nuevo contacto
   create(createContactDto: CreateContactDto): Promise<Contact> {
     return this.prisma.contact.create({
-      data: createContactDto,
+      data: { ...createContactDto, userId: 1 },
     });
   }
 

@@ -2,6 +2,7 @@ import { Company } from 'generated/prisma';
 import { UpdateCompanyDto } from '../dto/update-company.dto';
 
 export const mockCompany: Company = {
+  userId: 1,
   id: 1,
   name: 'Coca Cola',
   industry: 'Soft Drinks',
@@ -13,6 +14,7 @@ export const mockCompany: Company = {
 export const mockCompanys: Company[] = [
   mockCompany,
   {
+    userId: 1,
     id: 2,
     name: 'Pepsi',
     industry: 'Soft Drinks',

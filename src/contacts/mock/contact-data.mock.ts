@@ -1,6 +1,7 @@
 import { Contact } from 'generated/prisma';
 
 export const mockContact: Contact = {
+  userId: 1,
   id: 1,
   name: 'Paul',
   email: 'paul@example.com',
@@ -14,6 +15,7 @@ export const mockContact: Contact = {
 export const mockContacts: Contact[] = [
   mockContact,
   {
+    userId: 1,
     id: 2,
     name: 'David',
     email: 'david@example.com',

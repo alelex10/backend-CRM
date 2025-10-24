@@ -6,14 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  UseInterceptors,
-  Res,
   Query,
+  Request,
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { Find } from '../common/abstract/find';
 import { FintUserDto } from './dto/fint-user.dto';
 
 @Controller('company')
@@ -21,9 +19,12 @@ import { FintUserDto } from './dto/fint-user.dto';
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
+  // @Roles(Role.USER)
   @Post('create')
-  create(@Body() createCompanyDto: CreateCompanyDto) {
-    return this.companyService.create(createCompanyDto);
+  // @Public()
+  create(@Body() createCompanyDto: CreateCompanyDto, @Request() req : any) {
+    // console.log(req.user);
+    return this.companyService.create(createCompanyDto, req.user.sub);
   }
 
   // traer todos los company paginado

@@ -15,7 +15,10 @@ import { Find } from '../common/abstract/find';
 export class CompanyService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
+  async create(
+    createCompanyDto: CreateCompanyDto,
+    id: number,
+  ): Promise<Company> {
     const isUnique = await this.isUniqueName(createCompanyDto.name);
 
     if (isUnique) {
@@ -23,7 +26,7 @@ export class CompanyService {
     }
 
     return this.prisma.company.create({
-      data: createCompanyDto,
+      data: { ...createCompanyDto, userId: id },
     });
   }
 
