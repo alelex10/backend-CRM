@@ -23,7 +23,7 @@ model Company {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   contacts  Contact[] // Relación uno a muchos con Contact
-  User      User?     @relation(fields: [userId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id])
   userId    Int?
 }
 
@@ -36,10 +36,10 @@ model Contact {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
-  company   Company   @relation(fields: [companyId], references: [id]) // Definición de la relación
-  companyId Int       @map("company_id")
+  company   Company?  @relation(fields: [companyId], references: [id]) // Definición de la relación
+  companyId Int?       @map("company_id")
   notes     Note[] // Relación uno a uno con Note
-  User      User?     @relation(fields: [userId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id])
   userId    Int?      @map("user_id")
 }
 

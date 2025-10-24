@@ -48,7 +48,7 @@ describe('ContactsController (Unit)', () => {
     it('should call service.create and return the created contact', async () => {
       serviceMock.create.mockResolvedValue(mockContact);
 
-      const result = await controller.create(createContactDto);
+      const result = await controller.create(createContactDto, {});
 
       expect(serviceMock.create).toHaveBeenCalledWith(createContactDto);
       expect(result).toEqual(mockContact);

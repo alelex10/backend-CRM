@@ -9,9 +9,18 @@ export class ContactsService {
   constructor(private readonly prisma: PrismaService) {}
 
   // Crear un nuevo contacto
-  create(createContactDto: CreateContactDto): Promise<Contact> {
+  create(createContactDto: CreateContactDto, id: number): Promise<Contact> {
+    const hasCompany = createContactDto.companyId !== undefined;
     return this.prisma.contact.create({
-      data: { ...createContactDto, userId: 1 },
+      data: {
+        name: createContactDto.name,
+        email: createContactDto.email,
+        phone: createContactDto.phone,
+        company: hasCompany
+          ? { connect: { id: createContactDto.companyId } }
+          : undefined,
+        user: { connect: { id } },
+      },
     });
   }
 
