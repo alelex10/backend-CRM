@@ -39,6 +39,7 @@ model Contact {
   company   Company?  @relation(fields: [companyId], references: [id]) // Definición de la relación
   companyId Int?       @map("company_id")
   notes     Note[] // Relación uno a uno con Note
+  deals     Deal[] // Relación uno a muchos con Deal
   user      User?     @relation(fields: [userId], references: [id])
   userId    Int?      @map("user_id")
 }
@@ -62,6 +63,7 @@ model User {
   roles     Role[]
   contacts  Contact[] // Relación uno a muchos con Contact
   companies Company[] // Relación uno a muchos con Company
+  deals     Deal[] // Relación uno a muchos con Deal
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
 }
@@ -69,4 +71,39 @@ model User {
 enum Role {
   ADMIN
   USER
+}
+
+
+model Deal {
+  id              Int         @id @default(autoincrement())
+  title           String
+  value           Float
+  stage           DealStage
+  contactId       Int         @map("contact_id")
+  userId          Int         @map("user_id")
+  lossReasonId    Int?        @map("loss_reason_id")
+  lossReasonNote  String?     @map("loss_reason_note")
+  closedAt        DateTime?   @map("closed_at")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  contact         Contact     @relation(fields: [contactId], references: [id]) // Definición de la relación
+  user            User        @relation(fields: [userId], references: [id])
+  lossReason      LossReason? @relation(fields: [lossReasonId], references: [id])
+}
+
+model LossReason {
+  id        Int      @id @default(autoincrement())
+  name      String
+  deals     Deal[] // Relación uno a muchos con Deal
+}
+
+enum DealStage {
+  Entrada_de_Lead
+  Contacto_Establecido
+  Descubrimiento
+  Propuesta
+  Negociacion
+  Cerrado_Ganado
+  Cerrado_Perdido
 }
