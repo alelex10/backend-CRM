@@ -2,11 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDealDto } from './dto/create-deal.dto';
 import { UpdateDealDto } from './dto/update-deal.dto';
 import { PrismaService } from '../prisma/prisma.service';
-//import { Prisma } from '@generated/prisma';
-
-/*type DealWithRelations = Prisma.DealGetPayload<{
-  include: { contact: true; user: true; lossReason: true };
-}>;*/
+import { DealStage } from '@generated/prisma';
 
 @Injectable()
 export class DealsService {
@@ -14,10 +10,8 @@ export class DealsService {
 
   create(createDealDto: CreateDealDto, userId: number) {
     //return 'This action adds a new deal';
-    //const { contactId, lossReasonId, ...data } = createDealDto;
 
     return this.prisma.deal.create({
-      //data: { ...createDealDto, userId },
       data: {
         title: createDealDto.title,
         value: createDealDto.value,
@@ -36,11 +30,9 @@ export class DealsService {
       where: {
         userId,
       },
-      /*include: {
-        contact: true,
-        user: true,
+      include: {
         lossReason: true,
-      },*/
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -52,11 +44,9 @@ export class DealsService {
         id,
         userId,
       },
-      /*include: {
-        contact: true,
-        user: true,
+      include: {
         lossReason: true,
-      },*/
+      },
     });
 
     if (!deal) throw new NotFoundException(`Deal with ID ${id} not found`);
@@ -65,22 +55,35 @@ export class DealsService {
 
   async update(id: number, updateDealDto: UpdateDealDto, userId: number) {
     //return `This action updates a #${id} deal`;
-    //const existing = await this.prisma.deal.findUnique({ where: { id } });
-    //if (!existing) throw new NotFoundException(`Deal with ID ${id} not found`);
     await this.findOne(id, userId);
 
-    //const { lossReasonId, ...data } = updateDealDto;
+    // Determina la fecha de cierre si la etapa indica que se cerró el deal
+    const isClosedStage =
+      updateDealDto.stage === DealStage.Cerrado_Ganado ||
+      updateDealDto.stage === DealStage.Cerrado_Perdido;
+
+    const closedAt = isClosedStage ? new Date() : null;
+
+    const lossReasonId =
+      updateDealDto.stage === DealStage.Cerrado_Perdido
+        ? (updateDealDto.lossReasonId ?? 6) // default a 6 si no viene
+        : null; // Cerrado_Ganado o cualquier otra etapa se resetea
 
     return this.prisma.deal.update({
       where: { id },
-      data: updateDealDto,
+      data: {
+        ...updateDealDto,
+        closedAt,
+        lossReasonId,
+      },
+      include: {
+        lossReason: true,
+      },
     });
   }
 
   async remove(id: number, userId: number) {
     //return `This action removes a #${id} deal`;
-    //const existing = await this.prisma.deal.findUnique({ where: { id } });
-    //if (!existing) throw new NotFoundException(`Deal with ID ${id} not found`);
     await this.findOne(id, userId);
 
     await this.prisma.deal.delete({ where: { id } });

@@ -11,11 +11,6 @@ import {
 import { DealsService } from './deals.service';
 import { CreateDealDto } from './dto/create-deal.dto';
 import { UpdateDealDto } from './dto/update-deal.dto';
-//import { Prisma } from '@generated/prisma';
-
-/*type DealWithRelations = Prisma.DealGetPayload<{
-  include: { contact: true; user: true; lossReason: true };
-}>;*/
 
 @Controller('deals')
 export class DealsController {
