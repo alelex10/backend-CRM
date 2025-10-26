@@ -13,6 +13,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { DealsModule } from './deals/deals.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { DealsModule } from './deals/deals.module';
     UserModule,
     AuthModule,
     DealsModule,
+    DashboardModule,
   ],
   providers: [
     AppService,
