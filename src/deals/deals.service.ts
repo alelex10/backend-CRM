@@ -54,25 +54,42 @@ export class DealsService {
   }
 
   async update(id: number, updateDealDto: UpdateDealDto, userId: number) {
-    //return `This action updates a #${id} deal`;
-    await this.findOne(id, userId);
+    const existingDeal = await this.findOne(id, userId);
 
-    // Determina la fecha de cierre si la etapa indica que se cerró el deal
+    // Determinar stage final (puede venir del DTO o mantenerse igual)
+    const finalStage = updateDealDto.stage ?? existingDeal.stage;
+
+    // Determinar si está cerrado o no
     const isClosedStage =
-      updateDealDto.stage === DealStage.Cerrado_Ganado ||
-      updateDealDto.stage === DealStage.Cerrado_Perdido;
+      finalStage === DealStage.Cerrado_Ganado ||
+      finalStage === DealStage.Cerrado_Perdido;
 
-    const closedAt = isClosedStage ? new Date() : null;
+    // Si se cierra ahora (pasó de abierto a cerrado), ponemos fecha de cierre
+    // Si ya estaba cerrado, mantenemos su fecha anterior
+    // Si se reabre, lo dejamos en null
+    const closedAt =
+      isClosedStage && !existingDeal.closedAt
+        ? new Date()
+        : isClosedStage
+          ? existingDeal.closedAt
+          : null;
 
-    const lossReasonId =
-      updateDealDto.stage === DealStage.Cerrado_Perdido
-        ? (updateDealDto.lossReasonId ?? 6) // default a 6 si no viene
-        : null; // Cerrado_Ganado o cualquier otra etapa se resetea
+    // Determinar motivo de pérdida
+    // Si sigue siendo Cerrado_Perdido, permitimos modificarlo
+    // Si cambia de estado a otro, se limpia
+    let lossReasonId = existingDeal.lossReasonId;
+    if (finalStage === DealStage.Cerrado_Perdido) {
+      lossReasonId =
+        updateDealDto.lossReasonId ?? existingDeal.lossReasonId ?? 6;
+    } else {
+      lossReasonId = null;
+    }
 
     return this.prisma.deal.update({
       where: { id },
       data: {
         ...updateDealDto,
+        stage: finalStage,
         closedAt,
         lossReasonId,
       },
