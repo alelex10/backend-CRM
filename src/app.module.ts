@@ -12,6 +12,7 @@ import { AuthGuard } from './auth/guards/auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { DealsModule } from './deals/deals.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
     NotesModule,
     UserModule,
     AuthModule,
+    DealsModule,
   ],
   providers: [
     AppService,

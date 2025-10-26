@@ -18,7 +18,7 @@ export class ContactsController {
   constructor(private readonly contactsService: ContactsService) {}
 
   @Post()
-  create(@Body() createContactDto: CreateContactDto, @Request() req : any) {
+  create(@Body() createContactDto: CreateContactDto, @Request() req: any) {
     console.log(req.user);
     return this.contactsService.create(createContactDto, req.user.sub);
   }

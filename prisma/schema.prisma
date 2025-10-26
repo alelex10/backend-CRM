@@ -77,7 +77,7 @@ enum Role {
 model Deal {
   id              Int         @id @default(autoincrement())
   title           String
-  value           Float
+  value           Float?
   stage           DealStage
   contactId       Int         @map("contact_id")
   userId          Int         @map("user_id")
