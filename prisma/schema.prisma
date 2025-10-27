@@ -81,7 +81,7 @@ model Deal {
   title           String
   value           Float?
   stage           DealStage
-  contactId       Int         @map("contact_id")
+  contactId       Int?        @map("contact_id")
   userId          Int         @map("user_id")
   lossReasonId    Int?        @map("loss_reason_id")
   lossReasonNote  String?     @map("loss_reason_note")
@@ -89,7 +89,7 @@ model Deal {
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
   deletedAt       DateTime?   @map("deleted_at")
-  contact         Contact     @relation(fields: [contactId], references: [id]) // Definición de la relación
+  contact         Contact?    @relation(fields: [contactId], references: [id])
   user            User        @relation(fields: [userId], references: [id])
   lossReason      LossReason? @relation(fields: [lossReasonId], references: [id])
 }

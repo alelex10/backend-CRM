@@ -75,9 +75,13 @@ export class ContactsService {
   }
 
   // Obtener un contacto por ID
-  async findOne(id: number): Promise<Contact> {
+  async findOne(id: number, userId: number): Promise<Contact> {
     const contact = await this.prisma.contact.findUnique({
-      where: { id },
+      where: {
+        id,
+        userId,
+        deletedAt: null,
+      },
       include: {
         notes: true,
       },
@@ -98,11 +102,16 @@ export class ContactsService {
   async update(
     id: number,
     updateContactDto: UpdateContactDto,
+    userId: number,
   ): Promise<Contact> {
-    await this.findOne(id);
+    await this.findOne(id, userId);
 
     const updatedContact = await this.prisma.contact.update({
-      where: { id },
+      where: {
+        id,
+        userId,
+        deletedAt: null,
+      },
       data: updateContactDto,
     });
 
@@ -110,12 +119,27 @@ export class ContactsService {
   }
 
   // Eliminar un contacto
-  async remove(id: number): Promise<void> {
-    await this.findOne(id);
+  async remove(id: number, userId: number): Promise<void> {
+    await this.findOne(id, userId);
 
-    // Borrado lógico
+    // Soft delete de las notas relacionadas
+    await this.prisma.note.updateMany({
+      where: { contactId: id },
+      data: { deletedAt: new Date() },
+    });
+
+    // Desasociar los deals (mantenerlos para dashboard)
+    await this.prisma.deal.updateMany({
+      where: { contactId: id },
+      data: { contactId: null },
+    });
+
+    // Soft delete del contacto
     await this.prisma.contact.update({
-      where: { id },
+      where: {
+        id,
+        userId,
+      },
       data: { deletedAt: new Date() },
     });
   }

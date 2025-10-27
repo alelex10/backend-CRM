@@ -19,7 +19,7 @@ export class ContactsController {
 
   @Post()
   create(@Body() createContactDto: CreateContactDto, @Request() req: any) {
-    console.log(req.user);
+    //console.log(req.user);
     return this.contactsService.create(createContactDto, req.user.sub);
   }
 
@@ -41,18 +41,26 @@ export class ContactsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.contactsService.findOne(Number(id));
+  findOne(@Param('id') id: string, @Request() req: any) {
+    return this.contactsService.findOne(Number(id), req.user.sub);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateContactDto: UpdateContactDto) {
-    return this.contactsService.update(Number(id), updateContactDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateContactDto: UpdateContactDto,
+    @Request() req: any,
+  ) {
+    return this.contactsService.update(
+      Number(id),
+      updateContactDto,
+      req.user.sub,
+    );
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    await this.contactsService.remove(Number(id));
+  async remove(@Param('id') id: string, @Request() req: any) {
+    await this.contactsService.remove(Number(id), req.user.sub);
     return { message: `Contact with ID ${id} deleted successfully` };
   }
 }
