@@ -25,13 +25,14 @@ export class ContactsController {
 
   @Get()
   findAll(
+    @Request() req: any,
     @Query('name') name?: string,
     @Query('email') email?: string,
     @Query('orderBy') orderBy?: string,
     @Query('order') order?: 'asc' | 'desc',
     @Query('page') page?: number,
   ) {
-    return this.contactsService.findAll({
+    return this.contactsService.findAll(req.user.sub, {
       name,
       email,
       orderBy,

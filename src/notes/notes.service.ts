@@ -52,7 +52,9 @@ export class NotesService {
     });
 
     if (!note) {
-      throw new Error(`Note with ID ${id} not found or not accessible`);
+      throw new NotFoundException(
+        `Note with ID ${id} not found or not accessible`,
+      );
     }
 
     return note;

@@ -25,13 +25,16 @@ export class ContactsService {
   }
 
   // Obtener todos los contactos con/sin filtros
-  async findAll(params?: {
-    name?: string;
-    email?: string;
-    orderBy?: string;
-    order?: 'asc' | 'desc';
-    page?: number;
-  }) {
+  async findAll(
+    userId: number,
+    params?: {
+      name?: string;
+      email?: string;
+      orderBy?: string;
+      order?: 'asc' | 'desc';
+      page?: number;
+    },
+  ) {
     const {
       name,
       email,
@@ -46,6 +49,7 @@ export class ContactsService {
 
     const where: Prisma.ContactWhereInput = {
       deletedAt: null,
+      userId,
       ...(name && { name: { contains: name, mode: 'insensitive' } }),
       ...(email && { email: { contains: email, mode: 'insensitive' } }),
     };
@@ -83,7 +87,9 @@ export class ContactsService {
         deletedAt: null,
       },
       include: {
-        notes: true,
+        notes: {
+          where: { deletedAt: null },
+        },
       },
     });
 
