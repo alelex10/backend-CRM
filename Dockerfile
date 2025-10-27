@@ -17,11 +17,11 @@ CMD ["npm", "run", "start"]
 # para buil img:
     # -t: tag de la img
     # .: busca el Dockerfile en la carpeta actual
-# docker build -t backend-crm .
+# docker build -t alelex10/backend-crm .
 # para listar las img
 # docker images
 # para correr la img con comando tradicional
-# docker run -p 3001:3000 backend-crm
+# docker run -d -p 3001:3000 alelex10/backend-crm
 # o con comando estructurado y moderno
-# docker container run -p 3001:3000 backend-crm
+# docker container run -d -p 3001:3000 alelex10/backend-crm
 

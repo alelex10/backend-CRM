@@ -5,12 +5,10 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { SignInRequestDto } from './dtos/sign-in-request.dto';
-import { register } from 'module';
 import { RegisterRequestDto } from './dtos/register-request.dto';
 
 @Controller('auth')

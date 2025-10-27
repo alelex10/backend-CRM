@@ -11,6 +11,7 @@ import { RegisterRequestDto } from './dtos/register-request.dto';
 import { RegisterResponseDto } from './dtos/register-response.dto';
 import { Role } from '../../generated/prisma';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
@@ -19,10 +20,11 @@ export class AuthService {
     private usersService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private prisma: PrismaService,
   ) {
     this.SALT_ROUNDS = parseInt(this.configService.get('SALT_ROUNDS')!);
   }
-  
+
   async signIn(email: string, pass: string): Promise<{ access_token: string }> {
     const user = await this.usersService.findByEmail(email);
     console.log(user);
@@ -31,7 +33,7 @@ export class AuthService {
     }
 
     if (!(await bcrypt.compare(pass, user.password))) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid password');
     }
 
     const payload = {
@@ -50,6 +52,14 @@ export class AuthService {
       !this.comparePassword(registerDto.password, registerDto.confirmPassword)
     ) {
       throw new BadRequestException("Passwords don't match");
+    }
+
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: registerDto.email },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException('Email already in use');
     }
 
     registerDto.password = bcrypt.hashSync(

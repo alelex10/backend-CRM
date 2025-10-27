@@ -8,31 +8,6 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // simulate database
-  // private readonly users: () => Promise<User[]> = async () => [
-  //   {
-  //     username: 'john',
-  //     password: await bcrypt.hash('123123', 10),
-  //     roles: [Role.USER],
-  //     createdAt: new Date(),
-  //     updatedAt: new Date(),
-  //     contacts: [],
-  //     companies: [],
-  //     email: 'john@example',
-  //     id: 1,
-  //   },
-  //   {
-  //     username: 'jane',
-  //     password: await bcrypt.hash('123123', 10),
-  //     roles: [Role.USER],
-  //     createdAt: new Date(),
-  //     updatedAt: new Date(),
-  //     contacts: [],
-  //     companies: [],
-  //     email: 'jane@example',
-  //     id: 2,
-  //   },
-  // ];
   getProfile(id: number) {
     return this.findById(id);
   }

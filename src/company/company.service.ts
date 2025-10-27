@@ -50,6 +50,8 @@ export class CompanyService {
   ): Promise<IPaginatedResponse<Company>> {
     const { page = 1, limit = 10, search, order } = query;
 
+    console.log(order)
+
     const companies = await this.prisma.company.findMany({
       skip: (page - 1) * limit,
       take: limit,
@@ -60,6 +62,7 @@ export class CompanyService {
         userId,
       },
       orderBy: {
+        
         name: order,
       },
     });
