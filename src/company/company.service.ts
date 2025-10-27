@@ -37,6 +37,7 @@ export class CompanyService {
       where: {
         name,
         userId,
+        deletedAt: null,
       },
     });
 
@@ -60,6 +61,7 @@ export class CompanyService {
           contains: search,
         },
         userId,
+        deletedAt: null,
       },
       orderBy: {
         name: order,
@@ -74,6 +76,7 @@ export class CompanyService {
       where: {
         id,
         userId,
+        deletedAt: null,
       },
     });
 
@@ -94,6 +97,7 @@ export class CompanyService {
         where: {
           id,
           userId,
+          deletedAt: null,
         },
         data: updateCompanyDto,
       });
