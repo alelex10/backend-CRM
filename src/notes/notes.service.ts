@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -8,9 +8,27 @@ import { Note } from '../../generated/prisma';
 export class NotesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(contactId: number, createNoteDto: CreateNoteDto): Promise<Note> {
+  async create(
+    contactId: number,
+    createNoteDto: CreateNoteDto,
+    userId: number,
+  ): Promise<Note> {
     const { title, description } = createNoteDto;
 
+    // Verificar que el contacto pertenece al usuario autenticado
+    const contact = await this.prisma.contact.findFirst({
+      where: {
+        id: contactId,
+        userId,
+        deletedAt: null,
+      },
+    });
+
+    if (!contact) {
+      throw new NotFoundException(`Contact not found or not accessible`);
+    }
+
+    // Crear la nota
     return this.prisma.note.create({
       data: {
         title,
@@ -24,19 +42,29 @@ export class NotesService {
     return `This action returns all notes`;
   }*/
 
-  async findOne(id: number): Promise<Note> {
-    const note = await this.prisma.note.findUnique({ where: { id } });
+  async findOne(id: number, userId: number): Promise<Note> {
+    const note = await this.prisma.note.findUnique({
+      where: {
+        id,
+        deletedAt: null,
+        contact: { userId },
+      },
+    });
 
     if (!note) {
-      throw new Error(`Note with ID ${id} not found`);
+      throw new Error(`Note with ID ${id} not found or not accessible`);
     }
 
     return note;
   }
 
-  async update(id: number, updateNoteDto: UpdateNoteDto): Promise<Note> {
+  async update(
+    id: number,
+    updateNoteDto: UpdateNoteDto,
+    userId: number,
+  ): Promise<Note> {
     //return `This action updates a #${id} note`;
-    await this.findOne(id);
+    await this.findOne(id, userId);
 
     const updatedNote = await this.prisma.note.update({
       where: { id },
@@ -46,12 +74,14 @@ export class NotesService {
     return updatedNote;
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number, userId: number): Promise<void> {
     //return `This action removes a #${id} note`;
-    await this.findOne(id);
+    await this.findOne(id, userId);
 
-    await this.prisma.note.delete({
+    // Soft delete
+    await this.prisma.note.update({
       where: { id },
+      data: { deletedAt: new Date() },
     });
   }
 }
