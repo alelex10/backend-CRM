@@ -53,6 +53,7 @@ model Note {
   contactId   Int      @map("contact_id")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
   contact     Contact  @relation(fields: [contactId], references: [id]) // Definición de la relación
 }
 
@@ -87,7 +88,7 @@ model Deal {
   closedAt        DateTime?   @map("closed_at")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
-
+  deletedAt       DateTime?   @map("deleted_at")
   contact         Contact     @relation(fields: [contactId], references: [id]) // Definición de la relación
   user            User        @relation(fields: [userId], references: [id])
   lossReason      LossReason? @relation(fields: [lossReasonId], references: [id])
