@@ -101,18 +101,33 @@ export class CompanyService {
     }
   }
 
-  async remove(id: number, userId: number): Promise<Company> {
-    // eliminar company
-    try {
-      const company = await this.prisma.company.delete({
-        where: {
-          id,
-          userId,
-        },
-      });
-      return company;
-    } catch (error) {
-      throw new NotFoundException(`Company not found With id: ${id}`);
+  async remove(id: number, userId: number): Promise<{ message: string }> {
+    const company = await this.prisma.company.findFirst({
+      where: { id, userId, deletedAt: null },
+    });
+
+    if (!company) {
+      throw new NotFoundException(`Company not found with id: ${id}`);
     }
+
+    // Desasociar los contactos relacionados
+    await this.prisma.contact.updateMany({
+      where: {
+        companyId: id,
+        userId,
+      },
+      data: { companyId: null },
+    });
+
+    // Marcar la empresa como eliminada (soft delete)
+    await this.prisma.company.update({
+      where: {
+        id,
+        userId,
+      },
+      data: { deletedAt: new Date() },
+    });
+
+    return { message: `Company with ID ${id} soft deleted successfully` };
   }
 }

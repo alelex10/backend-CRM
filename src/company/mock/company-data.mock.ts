@@ -9,6 +9,7 @@ export const mockCompany: Company = {
   address: '123 Main St, Anytown, USA',
   createdAt: new Date(),
   updatedAt: new Date(),
+  deletedAt: null,
 };
 
 export const mockCompanys: Company[] = [
@@ -21,6 +22,7 @@ export const mockCompanys: Company[] = [
     address: '123 Main St, Anytown, USA',
     createdAt: new Date(),
     updatedAt: new Date(),
+    deletedAt: null,
   },
 ];
 
