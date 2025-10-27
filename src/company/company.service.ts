@@ -19,7 +19,7 @@ export class CompanyService {
     createCompanyDto: CreateCompanyDto,
     id: number,
   ): Promise<Company> {
-    const isUnique = await this.isUniqueName(createCompanyDto.name);
+    const isUnique = await this.isUniqueName(createCompanyDto.name, id);
 
     if (isUnique) {
       throw new BadRequestException('Company already exists');
@@ -32,10 +32,11 @@ export class CompanyService {
 
   // verificamos si el name de la company ya existe
   // si existe devolvemos true
-  async isUniqueName(name: string): Promise<boolean> {
+  async isUniqueName(name: string, userId: number): Promise<boolean> {
     const company = await this.prisma.company.findFirst({
       where: {
         name,
+        userId,
       },
     });
 
@@ -43,7 +44,10 @@ export class CompanyService {
   }
 
   // traemos todas las company paginados
-  async findAll(query: Find): Promise<IPaginatedResponse<Company>> {
+  async findAll(
+    query: Find,
+    userId: number,
+  ): Promise<IPaginatedResponse<Company>> {
     const { page = 1, limit = 10, search, order } = query;
 
     const companies = await this.prisma.company.findMany({
@@ -53,6 +57,7 @@ export class CompanyService {
         name: {
           contains: search,
         },
+        userId,
       },
       orderBy: {
         name: order,
@@ -62,15 +67,11 @@ export class CompanyService {
     return new ResponsePaginatedDto(companies, page, limit);
   }
 
-  async findOne(id: number): Promise<Company> {
+  async findOne(id: number, userId: number): Promise<Company> {
     const company = await this.prisma.company.findUnique({
       where: {
         id,
-      },
-      include: {
-        contacts: {
-          where: { deletedAt: null },
-        },
+        userId,
       },
     });
 
@@ -83,12 +84,14 @@ export class CompanyService {
   async update(
     id: number,
     updateCompanyDto: UpdateCompanyDto,
+    userId: number,
   ): Promise<Company> {
     // editar company
     try {
       const company = await this.prisma.company.update({
         where: {
           id,
+          userId,
         },
         data: updateCompanyDto,
       });
@@ -98,12 +101,13 @@ export class CompanyService {
     }
   }
 
-  async remove(id: number): Promise<Company> {
+  async remove(id: number, userId: number): Promise<Company> {
     // eliminar company
     try {
       const company = await this.prisma.company.delete({
         where: {
           id,
+          userId,
         },
       });
       return company;

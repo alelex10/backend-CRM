@@ -22,29 +22,33 @@ export class CompanyController {
   // @Roles(Role.USER)
   @Post('create')
   // @Public()
-  create(@Body() createCompanyDto: CreateCompanyDto, @Request() req : any) {
+  create(@Body() createCompanyDto: CreateCompanyDto, @Request() req: any) {
     // console.log(req.user);
     return this.companyService.create(createCompanyDto, req.user.sub);
   }
 
   // traer todos los company paginado
   @Get()
-  findAll(@Query() query: FintUserDto) {
-    return this.companyService.findAll(query);
+  findAll(@Query() query: FintUserDto, @Request() req: any) {
+    return this.companyService.findAll(query, req.user.sub);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.companyService.findOne(+id);
+  findOne(@Param('id') id: string, @Request() req: any) {
+    return this.companyService.findOne(+id, req.user.sub);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-    return this.companyService.update(+id, updateCompanyDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateCompanyDto: UpdateCompanyDto,
+    @Request() req: any,
+  ) {
+    return this.companyService.update(+id, updateCompanyDto, req.user.sub);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companyService.remove(+id);
+  remove(@Param('id') id: string, @Request() req: any) {
+    return this.companyService.remove(+id, req.user.sub);
   }
 }
