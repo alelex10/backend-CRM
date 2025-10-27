@@ -29,6 +29,7 @@ export class DealsService {
     return this.prisma.deal.findMany({
       where: {
         userId,
+        deletedAt: null,
       },
       include: {
         lossReason: true,
@@ -43,6 +44,7 @@ export class DealsService {
       where: {
         id,
         userId,
+        deletedAt: null,
       },
       include: {
         lossReason: true,
@@ -103,7 +105,12 @@ export class DealsService {
     //return `This action removes a #${id} deal`;
     await this.findOne(id, userId);
 
-    await this.prisma.deal.delete({ where: { id } });
+    //await this.prisma.deal.delete({ where: { id } });
+    await this.prisma.deal.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
     return { message: `Deal with ID ${id} deleted successfully` };
   }
 }
