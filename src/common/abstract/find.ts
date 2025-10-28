@@ -44,4 +44,7 @@ export abstract class Find {
   @IsOptional()
   @IsEnum(['asc', 'desc'])
   order?: 'asc' | 'desc' = 'asc';
+
+  @IsOptional()
+  orderBy?: "";
 }
