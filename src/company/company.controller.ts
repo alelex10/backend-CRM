@@ -13,6 +13,7 @@ import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { FintUserDto } from './dto/fint-user.dto';
+import { DeleteManyDto } from './dto/delete-many.dto';
 
 @Controller('company')
 // @UseInterceptors(ResponseInterceptor)
@@ -50,5 +51,10 @@ export class CompanyController {
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req: any) {
     return this.companyService.remove(+id, req.user.sub);
+  }
+
+  @Delete()
+  removeMany(@Body() body: DeleteManyDto, @Request() req: any) {
+    return this.companyService.removeMany(body.ids, req.user.sub);
   }
 }

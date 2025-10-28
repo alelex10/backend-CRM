@@ -48,26 +48,49 @@ export class CompanyService {
     query: Find,
     userId: number,
   ): Promise<IPaginatedResponse<Company>> {
-    const { page = 1, limit = 10, search, order } = query;
+    const { page = 1, limit = 10, search, order, orderBy = 'name' } = query;
 
-    console.log(order)
-
-    const companies = await this.prisma.company.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
+    // 1. Obtener el número total de registros
+    const totalCompanies = await this.prisma.company.count({
       where: {
         name: {
           contains: search,
         },
         userId,
       },
+    });
+
+    // 2. Calcular el número total de páginas
+    const totalPages = Math.ceil(totalCompanies / limit);
+
+    const companies = await this.prisma.company.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        AND: {
+          OR: [
+            {
+              name: {
+                startsWith: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              industry: {
+                startsWith: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
+          userId,
+        },
+      },
       orderBy: {
-        
-        name: order,
+        [orderBy]: order,
       },
     });
 
-    return new ResponsePaginatedDto(companies, page, limit);
+    return new ResponsePaginatedDto(companies, page, limit, totalPages);
   }
 
   async findOne(id: number, userId: number): Promise<Company> {
@@ -132,5 +155,53 @@ export class CompanyService {
     });
 
     return { message: `Company with ID ${id} soft deleted successfully` };
+  }
+
+  async removeMany(
+    ids: number[],
+    userId: number,
+  ): Promise<{ message: string }> {
+    console.log('tipo de ids: ', typeof ids[0]);
+    console.log('ids', ids);
+    const listIds = ids.map((id) => Number(+id));
+    const companies = await this.prisma.company.findMany({
+      where: {
+        id: {
+          in: listIds,
+        },
+        userId,
+        deletedAt: null,
+      },
+    });
+
+    console.log('companies', companies);
+
+    if (companies.length === 0) {
+      throw new NotFoundException(`Company not found with ids: ${ids}`);
+    }
+
+    await this.prisma.contact.updateMany({
+      where: {
+        companyId: {
+          in: listIds,
+        },
+        userId: userId,
+      },
+      data: {
+        companyId: null,
+      },
+    });
+
+    await this.prisma.company.updateMany({
+      where: {
+        id: {
+          in: listIds,
+        },
+        userId: userId,
+      },
+      data: { deletedAt: new Date() },
+    });
+
+    return { message: `Company deleted successfully with ids: ` + ids };
   }
 }

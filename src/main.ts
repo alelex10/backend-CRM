@@ -7,7 +7,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      // whitelist: true, // Elimina propiedades no esperadas
+      whitelist: true, // Elimina propiedades no esperadas
       // forbidNonWhitelisted: true, // Lanza error si hay propiedades no esperadas
       transform: true, // ¡ESTA OPCIÓN ES CRUCIAL! Habilita la transformación de tipos.
       transformOptions: {
