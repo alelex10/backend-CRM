@@ -8,9 +8,31 @@ import { DealStage } from '@generated/prisma';
 export class DealsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createDealDto: CreateDealDto, userId: number) {
-    //return 'This action adds a new deal';
+  async create(createDealDto: CreateDealDto, userId: number) {
+    // Verificar que el contacto exista y pertenezca al usuario
+    const contact = await this.prisma.contact.findFirst({
+      where: {
+        id: createDealDto.contactId,
+        userId,
+        deletedAt: null,
+      },
+    });
 
+    if (!contact) {
+      throw new NotFoundException(
+        `Contact with ID ${createDealDto.contactId} not found or not owned by user`,
+      );
+    }
+
+    // Si se incluye una razón de pérdida cuando se crea, volver a undefined
+    if (createDealDto.lossReasonId) {
+      createDealDto.lossReasonNote = undefined;
+    }
+    if (createDealDto.lossReasonNote) {
+      createDealDto.lossReasonId = undefined;
+    }
+
+    // Crear nota
     return this.prisma.deal.create({
       data: {
         title: createDealDto.title,

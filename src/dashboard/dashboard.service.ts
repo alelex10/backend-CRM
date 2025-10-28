@@ -8,7 +8,10 @@ export class DashboardService {
 
   async getDashboardStats(userId: number) {
     const deals = await this.prisma.deal.findMany({
-      where: { userId },
+      where: {
+        userId,
+        deletedAt: null,
+      },
       include: { lossReason: true },
     });
 
