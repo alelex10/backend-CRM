@@ -16,15 +16,11 @@ import { FintUserDto } from './dto/fint-user.dto';
 import { DeleteManyDto } from './dto/delete-many.dto';
 
 @Controller('company')
-// @UseInterceptors(ResponseInterceptor)
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
-  // @Roles(Role.USER)
   @Post('create')
-  // @Public()
   create(@Body() createCompanyDto: CreateCompanyDto, @Request() req: any) {
-    // console.log(req.user);
     return this.companyService.create(createCompanyDto, req.user.sub);
   }
 
@@ -45,6 +41,7 @@ export class CompanyController {
     @Body() updateCompanyDto: UpdateCompanyDto,
     @Request() req: any,
   ) {
+
     return this.companyService.update(+id, updateCompanyDto, req.user.sub);
   }
 

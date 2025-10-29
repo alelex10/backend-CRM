@@ -19,7 +19,7 @@ export class ContactsController {
 
   @Post()
   create(@Body() createContactDto: CreateContactDto, @Request() req: any) {
-    //console.log(req.user);
+    
     return this.contactsService.create(createContactDto, req.user.sub);
   }
 

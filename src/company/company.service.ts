@@ -22,7 +22,9 @@ export class CompanyService {
     const isUnique = await this.isUniqueName(createCompanyDto.name, id);
 
     if (isUnique) {
-      throw new BadRequestException('Company already exists');
+      throw new BadRequestException(
+        `Company already exists with name: ${createCompanyDto.name}, id: ${isUnique.id}`,
+      );
     }
 
     return this.prisma.company.create({
@@ -32,7 +34,7 @@ export class CompanyService {
 
   // verificamos si el name de la company ya existe
   // si existe devolvemos true
-  async isUniqueName(name: string, userId: number): Promise<boolean> {
+  async isUniqueName(name: string, userId: number): Promise<Company | null> {
     const company = await this.prisma.company.findFirst({
       where: {
         name,
@@ -41,7 +43,7 @@ export class CompanyService {
       },
     });
 
-    return !!company;
+    return company;
   }
 
   // traemos todas las company paginados

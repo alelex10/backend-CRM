@@ -1,13 +1,11 @@
+import { IsString } from 'class-validator';
 import { Company } from 'generated/prisma';
 
-interface ICreateCompanyDto
-  extends Omit<
-    Company,
-    'id' | 'createdAt' | 'updatedAt' | 'userId' | 'deletedAt'
-  > {}
-export class CreateCompanyDto implements ICreateCompanyDto {
+export class CreateCompanyDto implements Pick<Company, 'name' | 'industry' | 'address'> {
+  @IsString()
   name: string;
+  @IsString()
   industry: string;
+  @IsString()
   address: string;
-  // userId: number | null;
 }
