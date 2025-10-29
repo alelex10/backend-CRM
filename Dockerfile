@@ -24,4 +24,3 @@ CMD ["npm", "run", "start"]
 # docker run -d -p 3001:3000 alelex10/backend-crm
 # o con comando estructurado y moderno
 # docker container run -d -p 3001:3000 alelex10/backend-crm
-
