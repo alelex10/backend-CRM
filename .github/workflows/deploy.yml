@@ -118,9 +118,11 @@ jobs:
           echo "Token de autenticación obtenido ${HUB_TOKEN} and ${AUTH_TOKEN}"
 
           echo "🔍 Getting tags for $REPO..."
-          TAGS=$(curl -s -H "Authorization: Bearer $AUTH_TOKEN" "https://registry-1.docker.io/v2/alelex10/backend-crm/tags/list" | jq -r '.tags[]')
-          COUNT=$(echo "$TAGS" | wc -l)
-          echo "Found $COUNT tags"
+          
+          TAGS=$(curl -s -H "Authorization: Bearer $AUTH_TOKEN" "https://registry-1.docker.io/v2/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.REPO_NAME }}/tags/list" | jq -r '.tags[]')
+
+          # COUNT=$(echo "$TAGS" | wc -l)
+          # echo "Found $COUNT tags"
 
           # if [ "$COUNT" -gt "$KEEP" ]; then
           #   DELETE_TAGS=$(echo "$TAGS" | head -n -$KEEP)
