@@ -100,7 +100,8 @@ jobs:
           echo "Getting Docker Hub credentials..."
 
           AUTH_TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.REPO_NAME }}:pull" | jq -r '.token')
-        
+
+          curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.REPO_NAME }}:pull" | jq -r '.token'
 
           HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
           if [ -z "$HUB_TOKEN" ]; then
