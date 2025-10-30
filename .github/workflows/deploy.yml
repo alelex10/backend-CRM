@@ -62,13 +62,15 @@ jobs:
           key: ${{ secrets.OCI_SSH_KEY }}
           script: |
             set -e
-            IMAGE=${IMAGE_NAME}:${{ needs.build-and-push.outputs.image_tag }}
-            # parar y eliminar contenedor antiguo (ignorar errores)
-            docker stop ${{ secrets.CONTAINER_NAME }} || true
-            docker rm ${{ secrets.CONTAINER_NAME }} || true
-            # login a docker hub (no recomendado pasar token en el script, pero es una opción)
+            IMAGE="alelex10/backend-crm:${{ needs.build-and-push.outputs.image_tag }}"
+            CONTAINER_NAME="backend-crm"
+            CONTAINER_PORT=3001
+
+            docker stop $CONTAINER_NAME || true
+            docker rm $CONTAINER_NAME || true
+
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            # obtener imagen nueva
-            docker pull ${IMAGE}
-            # levantar contenedor (ajusta variables de puerto/env según tu app)
-            docker run -d --name ${{ secrets.CONTAINER_NAME }} -p ${{ secrets.CONTAINER_PORT }}:3000 --restart unless-stopped ${IMAGE}
+
+            docker pull $IMAGE
+
+            docker run -d --name $CONTAINER_NAME -p $CONTAINER_PORT:3000 --restart unless-stopped $IMAGE
