@@ -62,13 +62,13 @@ jobs:
           key: ${{ secrets.OCI_SSH_KEY }}
           script: |
 
-            CONTAINER_ID=$(docker ps -q --filter "publish=3001")
-            if [ -n "$CONTAINER_ID" ]; then
-            echo "🛑 Deteniendo contenedor que usa el puerto 3001 ($CONTAINER_ID)..."
-            docker stop $CONTAINER_ID
-            docker rm $CONTAINER_ID
-            fi
-            
+            # CONTAINER_ID=$(docker ps -q --filter "publish=3001")
+            # if [ -n "$CONTAINER_ID" ]; then
+            # echo "🛑 Deteniendo contenedor que usa el puerto 3001 ($CONTAINER_ID)..."
+            # docker stop $CONTAINER_ID
+            # docker rm $CONTAINER_ID
+            # fi
+
             set -e
             IMAGE="alelex10/backend-crm:${{ needs.build-and-push.outputs.image_tag }}"
             CONTAINER_NAME="backend-crm"
