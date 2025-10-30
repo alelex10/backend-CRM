@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: alelex10/backend-crm
+  IMAGE_NAME: alelex10/"${{ secrets.CONTAINER_NAME }}"
 
 jobs:
   build-and-push:
@@ -74,4 +74,8 @@ jobs:
 
             docker pull $IMAGE
 
-            docker run -d --name $CONTAINER_NAME -p $CONTAINER_PORT:3000 --restart unless-stopped $IMAGE
+            docker run -d \
+              -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
+              -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
+              -e JWT_SALT_ROUNDS='${{ secrets.JWT_SALT_ROUNDS }}' \
+              --name $CONTAINER_NAME -p $CONTAINER_PORT:3000 --restart unless-stopped $IMAGE
