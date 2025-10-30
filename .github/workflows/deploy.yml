@@ -119,10 +119,10 @@ jobs:
 
           echo "🔍 Getting tags for $REPO..."
           
-          TAGS=$(curl -s -H "Authorization: Bearer $AUTH_TOKEN" "https://registry-1.docker.io/v2/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.REPO_NAME }}/tags/list" | jq -r '.tags[]')
-          echo $TAGS
-          COUNT=$(echo "$TAGS" | wc -l)
-          echo "Found $COUNT tags"
+          curl -s -H "Authorization: Bearer $AUTH_TOKEN" "https://registry-1.docker.io/v2/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.REPO_NAME }}/tags/list"
+          # echo $TAGS
+          # COUNT=$(echo "$TAGS" | wc -l)
+          # echo "Found $COUNT tags"
 
           # if [ "$COUNT" -gt "$KEEP" ]; then
           #   DELETE_TAGS=$(echo "$TAGS" | head -n -$KEEP)
