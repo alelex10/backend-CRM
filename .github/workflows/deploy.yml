@@ -101,7 +101,7 @@ jobs:
 
           AUTH_TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.REPO_NAME }}:pull" | jq -r '.token')
 
-          curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.REPO_NAME }}:pull" | jq -r '.token'
+          curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:ale/${{ secrets.REPO_NAME }}:pull" | jq -r '.token'
 
           HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
           if [ -z "$HUB_TOKEN" ]; then
@@ -115,7 +115,8 @@ jobs:
           
           echo "Listando etiquetas para alelex10/backend-crm..."
 
-          curl -s -H "Authorization: Bearer $AUTH_TOKEN" "https://registry-1.docker.io/v2/alelex10/backend-crm/tags/list"
+          curl -s -H "Authorization: Bearer ${AUTH_TOKEN}" "https://registry-1.docker.io/v2/alelex10/backend-crm/tags/list"
+          
           # echo $TAGS
           # COUNT=$(echo "$TAGS" | wc -l)
           # echo "Found $COUNT tags"
