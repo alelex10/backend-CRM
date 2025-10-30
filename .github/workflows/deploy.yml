@@ -115,12 +115,12 @@ jobs:
             exit 1
           fi
 
-          echo "Token de autenticación obtenido"
+          echo "Token de autenticación obtenido ${HUB_TOKEN} and ${AUTH_TOKEN}"
 
-          # echo "🔍 Getting tags for $REPO..."
-          # TAGS=$(curl -s -H "Authorization: Bearer $AUTH_TOKEN" "https://registry-1.docker.io/v2/alelex10/backend-crm/tags/list" | jq -r '.tags[]')
-          # COUNT=$(echo "$TAGS" | wc -l)
-          # echo "Found $COUNT tags"
+          echo "🔍 Getting tags for $REPO..."
+          TAGS=$(curl -s -H "Authorization: Bearer $AUTH_TOKEN" "https://registry-1.docker.io/v2/alelex10/backend-crm/tags/list" | jq -r '.tags[]')
+          COUNT=$(echo "$TAGS" | wc -l)
+          echo "Found $COUNT tags"
 
           # if [ "$COUNT" -gt "$KEEP" ]; then
           #   DELETE_TAGS=$(echo "$TAGS" | head -n -$KEEP)
