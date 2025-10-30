@@ -121,7 +121,7 @@ jobs:
           
           echo "Listando etiquetas para alelex10/backend-crm..."
 
-          echo (curl -s -H "Authorization: Bearer $AUTH_TOKEN" "https://registry-1.docker.io/v2/alelex10/backend-crm/tags/list")
+          curl -s -H "Authorization: Bearer $AUTH_TOKEN" "https://registry-1.docker.io/v2/alelex10/backend-crm/tags/list"
           # echo $TAGS
           # COUNT=$(echo "$TAGS" | wc -l)
           # echo "Found $COUNT tags"
