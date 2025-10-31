@@ -101,7 +101,7 @@ jobs:
 
           TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${{ secrets.DOCKERHUB_USERNAME }}/backend-crm:pull" -u "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | jq -r '.token')
 
-          TAGS=$(curl -s -H "Authorization: Bearer $TOKEN" "https://registry-1.docker.io/v2/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}/tags/list"')
+          TAGS=$(curl -s -H "Authorization: Bearer $TOKEN" "https://registry-1.docker.io/v2/alelex10/${{ secrets.CONTAINER_NAME }}/tags/list" | jq -r '.tags[]')
 
           # HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
           # if [ -z "$HUB_TOKEN" ]; then
