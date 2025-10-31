@@ -109,15 +109,15 @@ jobs:
           #   exit 1
           # fi
 
-          echo "Token de autenticación obtenido ${HUB_TOKEN} and ${AUTH_TOKEN}"
+          # echo "Token de autenticación obtenido ${HUB_TOKEN} and ${TOKEN}"
 
-          echo "🔍 Getting tags for $REPO..."
+          # echo "🔍 Getting tags for $REPO..."
           
           # echo "Listando etiquetas para ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}..."
           
           
-          COUNT=$(echo "$TAGS" | wc -l)
-          echo "Found $COUNT tags"
+          # COUNT=$(echo "$TAGS" | wc -l)
+          # echo "Found $COUNT tags"
 
           # if [ "$COUNT" -gt "$KEEP" ]; then
           #   DELETE_TAGS=$(echo "$TAGS" | head -n -$KEEP)
