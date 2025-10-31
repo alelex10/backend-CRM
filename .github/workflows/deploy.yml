@@ -99,6 +99,8 @@ jobs:
           
           echo "Getting Docker Hub credentials..."
 
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+
           AUTH_TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.REPO_NAME }}:pull" | jq -r '.token')
 
           curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:ale/asdasd:pull" | jq -r '.token'
