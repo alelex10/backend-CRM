@@ -95,31 +95,29 @@ jobs:
       - name: Clean up old Docker images on Docker Hub
         run: |
           KEEP=5
-          REPO="alelex10/backend-crm"
+          REPO="${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}"
           
           echo "Getting Docker Hub credentials..."
 
           TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${{ secrets.DOCKERHUB_USERNAME }}/backend-crm:pull" -u "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | jq -r '.token')
 
-          curl -s -H "Authorization: Bearer $TOKEN" "https://registry-1.docker.io/v2/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}/tags/list"
+          TAGS=$(curl -s -H "Authorization: Bearer $TOKEN" "https://registry-1.docker.io/v2/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}/tags/list"')
 
-          # HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
-          # if [ -z "$HUB_TOKEN" ]; then
-          #   echo "Error: No se pudo obtener el token de autenticación."
-          #   exit 1
-          # fi
+          HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
+          if [ -z "$HUB_TOKEN" ]; then
+            echo "Error: No se pudo obtener el token de autenticación."
+            exit 1
+          fi
 
           echo "Token de autenticación obtenido ${HUB_TOKEN} and ${AUTH_TOKEN}"
 
           echo "🔍 Getting tags for $REPO..."
           
-          echo "Listando etiquetas para alelex10/backend-crm..."
-
-          # curl -s -H "Authorization: Bearer ${AUTH_TOKEN}" "https://registry-1.docker.io/v2/alelex10/backend-crm/tags/list"
+          echo "Listando etiquetas para ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}..."
           
-          # echo $TAGS
-          # COUNT=$(echo "$TAGS" | wc -l)
-          # echo "Found $COUNT tags"
+          
+          COUNT=$(echo "$TAGS" | wc -l)
+          echo "Found $COUNT tags"
 
           # if [ "$COUNT" -gt "$KEEP" ]; then
           #   DELETE_TAGS=$(echo "$TAGS" | head -n -$KEEP)
