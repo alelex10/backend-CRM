@@ -97,37 +97,29 @@ jobs:
           KEEP=5
           REPO="alelex10/backend-crm"
           
-          echo "Getting Docker Hub credentials..."
+          
+          echo "🔍 Getting tags for $REPO..."
 
           TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${{ secrets.DOCKERHUB_USERNAME }}/backend-crm:pull" -u "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | jq -r '.token')
 
           TAGS=$(curl -s -H "Authorization: Bearer $TOKEN" "https://registry-1.docker.io/v2/${{secrets.DOCKERHUB_USERNAME}}/${{ secrets.CONTAINER_NAME }}/tags/list" | jq -r '.tags[]')
 
-          # HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
-          # if [ -z "$HUB_TOKEN" ]; then
-          #   echo "Error: No se pudo obtener el token de autenticación."
-          #   exit 1
-          # fi
-
-          # echo "Token de autenticación obtenido ${HUB_TOKEN} and ${TOKEN}"
-
-          # echo "🔍 Getting tags for $REPO..."
-          
-          # echo "Listando etiquetas para ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}..."
-          
-          
           COUNT=$(echo "$TAGS" | wc -l)
           echo "Found $COUNT tags"
 
-          # if [ "$COUNT" -gt "$KEEP" ]; then
-          #   DELETE_TAGS=$(echo "$TAGS" | head -n -$KEEP)
-          #   for tag in $DELETE_TAGS; do
-          #     echo "🗑️ Deleting $tag..."
-          #     curl -i -X DELETE \
-          #       -H "Accept: application/json" \
-          #       -H "Authorization: JWT $HUB_TOKEN" \
-          #       https://hub.docker.com/v2/repositories/alelex10/backend-crm/tags/c6ddf45a/
-          #   done
-          # else
-          #   echo "No tags to delete."
-          # fi
+          echo "🗑️ Deleting old tags..."
+
+          HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r '.token')
+          
+          if [ "$COUNT" -gt "$KEEP" ]; then
+            DELETE_TAGS=$(echo "$TAGS" | head -n -$KEEP)
+            for tag in $DELETE_TAGS; do
+              echo "🗑️ Deleting $tag..."
+              curl -i -X DELETE \
+                -H "Accept: application/json" \
+                -H "Authorization: JWT $HUB_TOKEN" \
+                https://hub.docker.com/v2/repositories/alelex10/backend-crm/tags/$tag/
+            done
+          else
+            echo "No tags to delete."
+          fi
