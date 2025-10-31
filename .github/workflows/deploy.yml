@@ -95,7 +95,7 @@ jobs:
       - name: Clean up old Docker images on Docker Hub
         run: |
           KEEP=5
-          REPO="${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}"
+          REPO="alelex10/backend-crm"
           
           echo "Getting Docker Hub credentials..."
 
