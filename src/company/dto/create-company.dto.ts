@@ -1,11 +1,13 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { Company } from 'generated/prisma';
 
-export class CreateCompanyDto implements Pick<Company, 'name' | 'industry' | 'address'> {
-  @IsString()
+export class CreateCompanyDto
+  implements Pick<Company, 'name' | 'industry' | 'address'>
+{
+  @IsNotEmpty({ message: 'Name is required' })
   name: string;
-  @IsString()
+  @IsNotEmpty({ message: 'Industry is required' })
   industry: string;
-  @IsString()
+  @IsNotEmpty({ message: 'Address is required' })
   address: string;
 }
