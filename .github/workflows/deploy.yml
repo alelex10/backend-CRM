@@ -103,17 +103,17 @@ jobs:
 
           TAGS=$(curl -s -H "Authorization: Bearer $TOKEN" "https://registry-1.docker.io/v2/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}/tags/list"')
 
-          HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
-          if [ -z "$HUB_TOKEN" ]; then
-            echo "Error: No se pudo obtener el token de autenticación."
-            exit 1
-          fi
+          # HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"${{ secrets.DOCKERHUB_USERNAME }}\", \"password\": \"${{ secrets.DOCKERHUB_TOKEN }}\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
+          # if [ -z "$HUB_TOKEN" ]; then
+          #   echo "Error: No se pudo obtener el token de autenticación."
+          #   exit 1
+          # fi
 
           echo "Token de autenticación obtenido ${HUB_TOKEN} and ${AUTH_TOKEN}"
 
           echo "🔍 Getting tags for $REPO..."
           
-          echo "Listando etiquetas para ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}..."
+          # echo "Listando etiquetas para ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}..."
           
           
           COUNT=$(echo "$TAGS" | wc -l)
