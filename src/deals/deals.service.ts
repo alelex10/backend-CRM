@@ -55,6 +55,12 @@ export class DealsService {
       },
       include: {
         lossReason: true,
+        contact: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -70,6 +76,12 @@ export class DealsService {
       },
       include: {
         lossReason: true,
+        contact: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
