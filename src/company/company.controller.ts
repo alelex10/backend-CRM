@@ -17,7 +17,7 @@ import { DeleteManyDto } from './dto/delete-many.dto';
 
 @Controller('company')
 export class CompanyController {
-  constructor(private readonly companyService: CompanyService) {}
+  constructor(private readonly companyService: CompanyService) { }
 
   @Post('create')
   create(@Body() createCompanyDto: CreateCompanyDto, @Request() req: any) {
@@ -53,5 +53,11 @@ export class CompanyController {
   @Delete()
   removeMany(@Body() body: DeleteManyDto, @Request() req: any) {
     return this.companyService.removeMany(body.ids, req.user.sub);
+  }
+
+  @Get('contacts/:id')
+  getContactsOfCompany(@Param('id') id: string, @Request() req: any) {
+    console.log("se pudo entrar al controlador")
+    return this.companyService.getContactsOfCompany(+id, req.user.sub);
   }
 }
