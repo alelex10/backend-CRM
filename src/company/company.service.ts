@@ -176,7 +176,7 @@ export class CompanyService {
         deletedAt: null,
       },
     });
-
+    console.log("type company", typeof companies)
     console.log('companies', companies);
 
     if (companies.length === 0) {

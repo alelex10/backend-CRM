@@ -52,8 +52,9 @@ export class ContactsController {
   async updateCompanyMany(@Body() updateCompanyDto: UpdateCompanyManyDto, @Request() req: any) {
     return this.contactsService.updateCompanyMany(
       updateCompanyDto.contactIds,
-      updateCompanyDto.companyId,
-      req.user.sub);
+      req.user.sub,
+      updateCompanyDto.companyId
+      );
   }
 
   @Put(':id')

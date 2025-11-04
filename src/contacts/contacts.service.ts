@@ -6,8 +6,7 @@ import { UpdateContactDto } from './dto/update-contact.dto';
 
 @Injectable()
 export class ContactsService {
-
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   // Crear un nuevo contacto
   create(createContactDto: CreateContactDto, id: number): Promise<Contact> {
@@ -151,13 +150,19 @@ export class ContactsService {
     });
   }
 
-  async updateCompanyMany(contactIds: number[], sub: number, companyId: number) {
-    console.log(`companyId: ${companyId} typo: ${typeof companyId}`)
-    console.log(`contactIds: ${contactIds} typo: ${typeof contactIds}`)
-    if(contactIds.length === 0) {
+  async updateCompanyMany(
+    contactIds: number[],
+    sub: number,
+    newCompanyId: number,
+  ) {
+    
+    console.log(`companyId: ${newCompanyId} typo: ${typeof newCompanyId}`);
+    console.log(`contactIds: ${contactIds} typo: ${typeof contactIds}`);
+    console.log(`sub: ${sub} typo: ${typeof sub}`);
+    if (contactIds.length === 0) {
       throw new NotFoundException(`Contact not found with ids: ${contactIds}`);
     }
-    return await this.prisma.contact.updateMany({
+    const eliminate = await this.prisma.contact.updateMany({
       where: {
         id: {
           in: contactIds,
@@ -165,9 +170,21 @@ export class ContactsService {
         userId: sub,
       },
       data: {
-        companyId: companyId,
+        companyId: newCompanyId,
       },
     });
-  }
 
+    console.log("eliminate", eliminate)
+
+    const contacts = await this.prisma.contact.findMany({
+      where: {
+        id: {
+          in: contactIds,
+        },
+      },
+    });
+    console.log('contacts', contacts);
+
+    return contacts;
+  }
 }
