@@ -166,8 +166,6 @@ export class CompanyService {
     ids: number[],
     userId: number,
   ): Promise<{ message: string }> {
-    console.log('tipo de ids: ', typeof ids[0]);
-    console.log('ids', ids);
     const listIds = ids.map((id) => Number(+id));
     const companies = await this.prisma.company.findMany({
       where: {
@@ -182,7 +180,9 @@ export class CompanyService {
     console.log('companies', companies);
 
     if (companies.length === 0) {
-      throw new NotFoundException(`Company not found with ids: ${ids}`);
+      throw new NotFoundException(
+        `Company·not·found·with·ids:·${ids.join(',')}`,
+      );
     }
 
     await this.prisma.contact.updateMany({

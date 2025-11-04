@@ -6,7 +6,8 @@ import { UpdateContactDto } from './dto/update-contact.dto';
 
 @Injectable()
 export class ContactsService {
-  constructor(private readonly prisma: PrismaService) {}
+
+  constructor(private readonly prisma: PrismaService) { }
 
   // Crear un nuevo contacto
   create(createContactDto: CreateContactDto, id: number): Promise<Contact> {
@@ -149,4 +150,24 @@ export class ContactsService {
       data: { deletedAt: new Date() },
     });
   }
+
+  async updateCompanyMany(contactIds: number[], sub: number, companyId: number) {
+    console.log(`companyId: ${companyId} typo: ${typeof companyId}`)
+    console.log(`contactIds: ${contactIds} typo: ${typeof contactIds}`)
+    if(contactIds.length === 0) {
+      throw new NotFoundException(`Contact not found with ids: ${contactIds}`);
+    }
+    return await this.prisma.contact.updateMany({
+      where: {
+        id: {
+          in: contactIds,
+        },
+        userId: sub,
+      },
+      data: {
+        companyId: companyId,
+      },
+    });
+  }
+
 }

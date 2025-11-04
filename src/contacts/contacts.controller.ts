@@ -12,14 +12,15 @@ import {
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
+import { UpdateCompanyManyDto } from './dto/update-company-many.dto';
 
 @Controller('contacts')
 export class ContactsController {
-  constructor(private readonly contactsService: ContactsService) {}
+  constructor(private readonly contactsService: ContactsService) { }
 
   @Post()
   create(@Body() createContactDto: CreateContactDto, @Request() req: any) {
-    
+
     return this.contactsService.create(createContactDto, req.user.sub);
   }
 
@@ -46,6 +47,15 @@ export class ContactsController {
     return this.contactsService.findOne(Number(id), req.user.sub);
   }
 
+
+  @Put("/many")
+  async updateCompanyMany(@Body() updateCompanyDto: UpdateCompanyManyDto, @Request() req: any) {
+    return this.contactsService.updateCompanyMany(
+      updateCompanyDto.contactIds,
+      updateCompanyDto.companyId,
+      req.user.sub);
+  }
+
   @Put(':id')
   update(
     @Param('id') id: string,
@@ -64,4 +74,7 @@ export class ContactsController {
     await this.contactsService.remove(Number(id), req.user.sub);
     return { message: `Contact with ID ${id} deleted successfully` };
   }
+
+
+
 }

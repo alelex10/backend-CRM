@@ -4,7 +4,6 @@ import {
   IsString,
   IsEmail,
   IsNotEmpty,
-  IsEmpty,
 } from 'class-validator';
 
 export class CreateContactDto {
