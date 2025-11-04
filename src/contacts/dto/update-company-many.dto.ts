@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsInt } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsEmpty, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class UpdateCompanyManyDto {
   @IsArray()
@@ -8,5 +8,7 @@ export class UpdateCompanyManyDto {
   @Type(() => Number) // convierte strings a números
   contactIds: number[];
 
+  @IsOptional()
+  @IsInt()
   companyId: number | null;
 }
