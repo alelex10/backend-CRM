@@ -90,6 +90,11 @@ export class ContactsService {
         notes: {
           where: { deletedAt: null },
         },
+        company: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
