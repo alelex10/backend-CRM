@@ -41,6 +41,11 @@ export class ContactsController {
     });
   }
 
+  @Get('company-null')
+  findAllCompanyNull() {
+    return this.contactsService.findAllCompanyNull();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @Request() req: any) {
     return this.contactsService.findOne(Number(id), req.user.sub);

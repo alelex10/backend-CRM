@@ -155,7 +155,6 @@ export class ContactsService {
     sub: number,
     newCompanyId: number | null,
   ) {
-    
     console.log(`companyId: ${newCompanyId} typo: ${typeof newCompanyId}`);
     console.log(`contactIds: ${contactIds} typo: ${typeof contactIds}`);
     console.log(`sub: ${sub} typo: ${typeof sub}`);
@@ -174,7 +173,7 @@ export class ContactsService {
       },
     });
 
-    console.log("eliminate", eliminate)
+    console.log('eliminate', eliminate);
 
     const contacts = await this.prisma.contact.findMany({
       where: {
@@ -186,5 +185,12 @@ export class ContactsService {
     console.log('contacts', contacts);
 
     return contacts;
+  }
+  findAllCompanyNull() {
+    return this.prisma.contact.findMany({
+      where: {
+        companyId: null,
+      },
+    });
   }
 }
