@@ -6,7 +6,7 @@ import {
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { Company } from '../../generated/prisma';
+import { Company, Contact } from '../../generated/prisma';
 import { IPaginatedResponse } from '../common/interface/paginated-response.interface';
 import { ResponsePaginatedDto } from '../common/abstract/response-paginated.dto';
 import { Find } from '../common/abstract/find';
@@ -128,7 +128,9 @@ export class CompanyService {
       });
       return company;
     } catch (error) {
-      throw new BadRequestException(`Company not found With id: ${id}`);
+      throw new BadRequestException(
+        `Company not found With id: ${id}. ${error}`,
+      );
     }
   }
 
@@ -166,8 +168,6 @@ export class CompanyService {
     ids: number[],
     userId: number,
   ): Promise<{ message: string }> {
-    console.log('tipo de ids: ', typeof ids[0]);
-    console.log('ids', ids);
     const listIds = ids.map((id) => Number(+id));
     const companies = await this.prisma.company.findMany({
       where: {
@@ -178,11 +178,13 @@ export class CompanyService {
         deletedAt: null,
       },
     });
-
+    console.log('type company', typeof companies);
     console.log('companies', companies);
 
     if (companies.length === 0) {
-      throw new NotFoundException(`Company not found with ids: ${ids}`);
+      throw new NotFoundException(
+        `Company·not·found·with·ids:·${ids.join(',')}`,
+      );
     }
 
     await this.prisma.contact.updateMany({
@@ -207,6 +209,33 @@ export class CompanyService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: `Company deleted successfully with ids: ` + ids };
+    return {
+      message: `Company deleted successfully with ids: ` + ids.join(','),
+    };
+  }
+
+  async getContactsOfCompany(id: number, userId: number): Promise<Contact[]> {
+    const company = await this.prisma.company.findUnique({
+      where: {
+        id,
+        userId,
+        deletedAt: null,
+      },
+    });
+
+    if (!company) {
+      throw new NotFoundException(`Company not found with id: ${id}`);
+    }
+
+    const contacts = await this.prisma.contact.findMany({
+      where: {
+        companyId: id,
+        userId,
+      },
+    });
+
+    console.log('contacts', contacts);
+
+    return contacts;
   }
 }

@@ -12,6 +12,7 @@ import {
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
+import { UpdateCompanyManyDto } from './dto/update-company-many.dto';
 
 @Controller('contacts')
 export class ContactsController {
@@ -19,7 +20,6 @@ export class ContactsController {
 
   @Post()
   create(@Body() createContactDto: CreateContactDto, @Request() req: any) {
-    
     return this.contactsService.create(createContactDto, req.user.sub);
   }
 
@@ -41,9 +41,26 @@ export class ContactsController {
     });
   }
 
+  @Get('company-null')
+  findAllCompanyNull() {
+    return this.contactsService.findAllCompanyNull();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @Request() req: any) {
     return this.contactsService.findOne(Number(id), req.user.sub);
+  }
+
+  @Put('/many')
+  async updateCompanyMany(
+    @Body() updateCompanyDto: UpdateCompanyManyDto,
+    @Request() req: any,
+  ) {
+    return this.contactsService.updateCompanyMany(
+      updateCompanyDto.contactIds,
+      req.user.sub,
+      updateCompanyDto.companyId || null,
+    );
   }
 
   @Put(':id')

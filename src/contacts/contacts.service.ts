@@ -154,4 +154,48 @@ export class ContactsService {
       data: { deletedAt: new Date() },
     });
   }
+
+  async updateCompanyMany(
+    contactIds: number[],
+    sub: number,
+    newCompanyId: number | null,
+  ) {
+    console.log(`companyId: ${newCompanyId} typo: ${typeof newCompanyId}`);
+    console.log(`contactIds: ${contactIds} typo: ${typeof contactIds}`);
+    console.log(`sub: ${sub} typo: ${typeof sub}`);
+    if (contactIds.length === 0) {
+      throw new NotFoundException(`Contact not found with ids: ${contactIds}`);
+    }
+    const eliminate = await this.prisma.contact.updateMany({
+      where: {
+        id: {
+          in: contactIds,
+        },
+        userId: sub,
+      },
+      data: {
+        companyId: newCompanyId,
+      },
+    });
+
+    console.log('eliminate', eliminate);
+
+    const contacts = await this.prisma.contact.findMany({
+      where: {
+        id: {
+          in: contactIds,
+        },
+      },
+    });
+    console.log('contacts', contacts);
+
+    return contacts;
+  }
+  findAllCompanyNull() {
+    return this.prisma.contact.findMany({
+      where: {
+        companyId: null,
+      },
+    });
+  }
 }

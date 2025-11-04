@@ -5,19 +5,17 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from '../decorators/roles.decorator'; 
+import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../../../generated/prisma';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {} 
+  constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    
-    
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      context.getHandler(), 
-      context.getClass(), 
+      context.getHandler(),
+      context.getClass(),
     ]);
 
     if (!requiredRoles) {
@@ -27,7 +25,7 @@ export class RolesGuard implements CanActivate {
     const { user } = context.switchToHttp().getRequest();
 
     if (!user) {
-      throw new ForbiddenException('Usuario no autenticado'); 
+      throw new ForbiddenException('Usuario no autenticado');
     }
 
     const hasRole = requiredRoles.some((role) => user.roles?.includes(role));
@@ -39,6 +37,6 @@ export class RolesGuard implements CanActivate {
         `Se requiere uno de los siguientes roles: ${requiredRoles.join(', ')}`,
       );
     }
-    return true; 
+    return true;
   }
 }
