@@ -128,7 +128,9 @@ export class CompanyService {
       });
       return company;
     } catch (error) {
-      throw new BadRequestException(`Company not found With id: ${id}`);
+      throw new BadRequestException(
+        `Company not found With id: ${id}. ${error}`,
+      );
     }
   }
 
@@ -176,7 +178,7 @@ export class CompanyService {
         deletedAt: null,
       },
     });
-    console.log("type company", typeof companies)
+    console.log('type company', typeof companies);
     console.log('companies', companies);
 
     if (companies.length === 0) {
@@ -207,7 +209,9 @@ export class CompanyService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: `Company deleted successfully with ids: ` + ids };
+    return {
+      message: `Company deleted successfully with ids: ` + ids.join(','),
+    };
   }
 
   async getContactsOfCompany(id: number, userId: number): Promise<Contact[]> {
