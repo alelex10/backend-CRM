@@ -16,11 +16,10 @@ import { UpdateCompanyManyDto } from './dto/update-company-many.dto';
 
 @Controller('contacts')
 export class ContactsController {
-  constructor(private readonly contactsService: ContactsService) { }
+  constructor(private readonly contactsService: ContactsService) {}
 
   @Post()
   create(@Body() createContactDto: CreateContactDto, @Request() req: any) {
-
     return this.contactsService.create(createContactDto, req.user.sub);
   }
 
@@ -47,14 +46,16 @@ export class ContactsController {
     return this.contactsService.findOne(Number(id), req.user.sub);
   }
 
-
-  @Put("/many")
-  async updateCompanyMany(@Body() updateCompanyDto: UpdateCompanyManyDto, @Request() req: any) {
+  @Put('/many')
+  async updateCompanyMany(
+    @Body() updateCompanyDto: UpdateCompanyManyDto,
+    @Request() req: any,
+  ) {
     return this.contactsService.updateCompanyMany(
       updateCompanyDto.contactIds,
       req.user.sub,
-      updateCompanyDto.companyId
-      );
+      updateCompanyDto.companyId || null,
+    );
   }
 
   @Put(':id')
@@ -75,7 +76,4 @@ export class ContactsController {
     await this.contactsService.remove(Number(id), req.user.sub);
     return { message: `Contact with ID ${id} deleted successfully` };
   }
-
-
-
 }

@@ -153,7 +153,7 @@ export class ContactsService {
   async updateCompanyMany(
     contactIds: number[],
     sub: number,
-    newCompanyId: number,
+    newCompanyId: number | null,
   ) {
     
     console.log(`companyId: ${newCompanyId} typo: ${typeof newCompanyId}`);

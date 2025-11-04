@@ -8,7 +8,5 @@ export class UpdateCompanyManyDto {
   @Type(() => Number) // convierte strings a números
   contactIds: number[];
 
-  @IsInt()
-  @Type(() => Number) // convierte strings a números
-  companyId: number;
+  companyId: number | null;
 }
